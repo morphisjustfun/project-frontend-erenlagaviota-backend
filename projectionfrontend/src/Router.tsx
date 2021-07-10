@@ -1,19 +1,20 @@
 import React from "react";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Login from "./components/login/Login";
 import OAuth2RedirectHandler from "./components/login/OAuth2RedirectHandler";
 
-function Router() {
+function App() {
   return (
-    <BrowserRouter>
+    <Router basename={process.env.PUBLIC_URL}>
       <Switch>
-        <Route exact path="/" component={Login}>
-        </Route>
-        <Route path="/oauth2/redirect" component={OAuth2RedirectHandler}>
-        </Route>
+        <Route exact path="/" component={Login}></Route>
+        <Route
+          path="/oauth2/redirect"
+          component={OAuth2RedirectHandler}
+        ></Route>
       </Switch>
-    </BrowserRouter>
+    </Router>
   );
 }
 
-export default Router;
+export default App;
