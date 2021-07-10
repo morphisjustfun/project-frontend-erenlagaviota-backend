@@ -3,6 +3,7 @@ import { ACCESS_TOKEN } from "../constants";
 interface RequestOptions {
   url: string;
   method: string;
+  body?: any;
 }
 
 const request = (options: RequestOptions) => {

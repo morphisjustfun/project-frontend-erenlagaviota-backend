@@ -23,19 +23,24 @@ export const logOut = () => {
 };
 
 export const logIn = () => {
-  getCurrentUser().then((response) => {
-    return (dispatch: Dispatch<loginAction>) => {
-        console.log("asdd");
-      dispatch({
-        type: loginType.LOG_IN,
-        currentUser: response,
-        authenticated: true,
-      });
-    };
-  });
-  return (dispatch: Dispatch<any>) => {
-    dispatch({
-      type: "",
+  return (dispatch: Dispatch<loginAction>) => {
+    // setTimeout(() => {
+    //   dispath({
+    //     type: loginType.LOG_IN,
+    //     authenticated: true,
+    //     currentUser: 'mario'
+    //   });
+    // }, 1000);
+
+    getCurrentUser().then((response) => {
+      if (response.ok) {
+        dispatch({
+          type: loginType.LOG_IN,
+          authenticated: true,
+          currentUser: response,
+        });
+      } else {
+      }
     });
   };
 };

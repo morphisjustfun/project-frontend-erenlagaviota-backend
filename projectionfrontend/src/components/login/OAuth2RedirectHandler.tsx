@@ -4,7 +4,7 @@ import React from "react";
 
 const OAuth2RedirectHandler = (props: RouteComponentProps) => {
   const getUrlParameter = (name: string) => {
-    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    name = name.replace(/[[]/, "\\[").replace(/[\]]/, "\\]");
     const regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
 
     const results = regex.exec(props.location.search);
@@ -24,8 +24,7 @@ const OAuth2RedirectHandler = (props: RouteComponentProps) => {
     return (
       <Redirect
         to={{
-          pathname: "/",
-          state: { from: props.location },
+          pathname: "/", state: { from: props.location },
         }}
       />
     );
