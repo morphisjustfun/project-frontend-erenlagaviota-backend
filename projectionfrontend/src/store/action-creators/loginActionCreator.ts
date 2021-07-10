@@ -25,6 +25,7 @@ export const logOut = () => {
 export const logIn = () => {
   getCurrentUser().then((response) => {
     return (dispatch: Dispatch<loginAction>) => {
+        console.log("asdd");
       dispatch({
         type: loginType.LOG_IN,
         currentUser: response,
