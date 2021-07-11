@@ -12,6 +12,7 @@ const Login = (): JSX.Element => {
   const dispatch = useDispatch();
 
   const cursoPicked : RefObject<HTMLInputElement> = useRef(null);
+  const [show, setShow]=React.useState(false);
 
   const { logIn } = bindActionCreators(
     loginActionCreators,
@@ -29,17 +30,26 @@ const Login = (): JSX.Element => {
    }, []);
 
   return (
-    <div>
+    <div id="parent">
       <h1> Authenticated: {state.authenticated.toString()} </h1>
       <button onClick={() => {
         logIn();
       }}> Actualizar </button>
-      <a href={GOOGLE_AUTH_URL}> Log in </a>
+
+      <a href={GOOGLE_AUTH_URL}> Log in </a>  
+      <br/>
       <input ref={cursoPicked}/>
       <button onClick={async () => {
-      const respuesta = await getNumericalPrediction(cursoPicked.current!.value);
-      console.log(respuesta);
+        setShow(true);
+        const respuesta = await getNumericalPrediction(cursoPicked.current!.value);
+        console.log(respuesta);
+        setShow(false);
+      
       }}>Calcular</button>
+      <br/>
+      {
+        show?<label>Cargando...</label>:null
+      }
     </div>
   );
 };
