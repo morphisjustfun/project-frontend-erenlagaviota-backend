@@ -13,6 +13,12 @@ interface log_in {
   type: loginType.LOG_IN;
   currentUser: any;
   authenticated: boolean;
+  imageUrl: string;
 }
 
-export type loginAction = toggle_loading | log_out | log_in;
+interface get_imageUrl {
+    type: loginType.GET_IMAGEURL;
+    imageUrl: string;
+}
+
+export type loginAction = toggle_loading | log_out | log_in | get_imageUrl;

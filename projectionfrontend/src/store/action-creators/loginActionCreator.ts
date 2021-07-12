@@ -24,14 +24,25 @@ export const logOut = () => {
 
 export const logIn = () => {
   return (dispatch: Dispatch<loginAction>) => {
-    getCurrentUser().then((response) => {
+    getCurrentUser().then(async (response) => {
       if (response.ok) {
+          const json = await response.json();
         dispatch({
           type: loginType.LOG_IN,
           authenticated: true,
           currentUser: response,
+          imageUrl: json.imageUrl,
         });
       }
+    });
+  };
+};
+
+export const getImageUrl = (imageUrl: string) => {
+  return (dispatch: Dispatch<loginAction>) => {
+    dispatch({
+      type: loginType.GET_IMAGEURL,
+      imageUrl: imageUrl,
     });
   };
 };

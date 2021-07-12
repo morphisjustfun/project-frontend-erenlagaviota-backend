@@ -6,6 +6,7 @@ import { loginActionCreators } from "../../store";
 import { loginState } from "../../store/action-types/loginType";
 import { GOOGLE_AUTH_URL } from "../../business/constants";
 import { getNumericalPrediction } from "../../business/request/dataApi";
+import GoogleButton from 'react-google-button'
 
 const Login = (): JSX.Element => {
   const state = useSelector((state: RootState) => state.login) as loginState;
@@ -30,6 +31,7 @@ const Login = (): JSX.Element => {
   return (
     <div id="parent">
       <h1> Authenticated: {state.authenticated.toString()} </h1>
+      <img src={state.imageUrl} alt="Not logged"/>
       <button
         onClick={() => {
           logIn();
@@ -38,7 +40,9 @@ const Login = (): JSX.Element => {
         Actualizar
       </button>
 
-      <a href={GOOGLE_AUTH_URL}> Log in </a>
+      <GoogleButton onClick={() => {
+        window.location.href = GOOGLE_AUTH_URL;
+      }}/>
       <br />
       <input ref={cursoPicked} />
       <button
