@@ -26,6 +26,7 @@ const OAuth2RedirectHandler = (props: RouteComponentProps) => {
       />
     );
   } else {
+  alert("Usuario no válido");
     return <Redirect to={{ pathname: "/" }}></Redirect>;
   }
 };
