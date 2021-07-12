@@ -24,14 +24,6 @@ export const logOut = () => {
 
 export const logIn = () => {
   return (dispatch: Dispatch<loginAction>) => {
-    // setTimeout(() => {
-    //   dispath({
-    //     type: loginType.LOG_IN,
-    //     authenticated: true,
-    //     currentUser: 'mario'
-    //   });
-    // }, 1000);
-
     getCurrentUser().then((response) => {
       if (response.ok) {
         dispatch({
@@ -39,7 +31,6 @@ export const logIn = () => {
           authenticated: true,
           currentUser: response,
         });
-      } else {
       }
     });
   };

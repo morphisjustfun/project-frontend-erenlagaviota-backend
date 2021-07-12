@@ -16,9 +16,6 @@ const OAuth2RedirectHandler = (props: RouteComponentProps) => {
   const token = getUrlParameter("token");
   const error = getUrlParameter("error");
 
-  console.log(token);
-  console.log(error);
-
   if (token) {
     localStorage.setItem(ACCESS_TOKEN, token);
     return (

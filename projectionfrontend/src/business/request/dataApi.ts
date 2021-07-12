@@ -1,16 +1,29 @@
 import { API_BASE_URL } from "../constants";
 import request from "./securityConfig";
+import {store} from "../../store/store";
+import {toggleLoading} from "../../store/action-creators/loginActionCreator";
 
-export const getNumericalPrediction = (curso: string) => {
-  return request({
-    url: API_BASE_URL + "/data",
+
+interface NumericalPrediction {
+  numericalProjection: number;
+}
+
+export const getNumericalPrediction = async (
+  curso: string
+): Promise<NumericalPrediction> => {
+    toggleLoading(true)(store.dispatch);
+  const response = await request({
+    url: API_BASE_URL + "/data/numericalProjection",
     method: "POST",
     body: JSON.stringify({
-      name: curso,
+      course: curso,
     }),
-  }).then((response) => {
-      if (response.ok){
-          return response.json();
-      }
   });
+  if (response.ok) {
+    toggleLoading(false)(store.dispatch);
+    return response.json();
+  } else {
+    toggleLoading(false)(store.dispatch);
+    return Promise.reject("No data found");
+  }
 };
