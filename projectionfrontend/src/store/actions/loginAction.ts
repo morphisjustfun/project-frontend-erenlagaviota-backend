@@ -2,7 +2,7 @@ import { loginType } from "../action-types/loginType";
 
 interface toggle_loading {
   type: loginType.TOGGLE_LOADING;
-  loadingValue: boolean;
+  loading: boolean;
 }
 
 interface log_out {
@@ -12,13 +12,16 @@ interface log_out {
 interface log_in {
   type: loginType.LOG_IN;
   currentUser: any;
-  authenticated: boolean;
+  authenticated: {
+    authenticated: boolean;
+    waiting: boolean;
+  };
   imageUrl: string;
 }
 
 interface get_imageUrl {
-    type: loginType.GET_IMAGEURL;
-    imageUrl: string;
+  type: loginType.GET_IMAGEURL;
+  imageUrl: string;
 }
 
 export type loginAction = toggle_loading | log_out | log_in | get_imageUrl;

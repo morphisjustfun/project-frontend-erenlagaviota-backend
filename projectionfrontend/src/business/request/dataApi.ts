@@ -1,17 +1,20 @@
 import { API_BASE_URL } from "../constants";
 import request from "./securityConfig";
-import {store} from "../../store/store";
-import {toggleLoading} from "../../store/action-creators/loginActionCreator";
 
 
 interface NumericalPrediction {
   numericalProjection: number;
 }
 
+export interface ValidCourses {
+    codcurso: string;
+    department: string;
+    name: string;
+}
+
 export const getNumericalPrediction = async (
   curso: string
 ): Promise<NumericalPrediction> => {
-    toggleLoading(true)(store.dispatch);
   const response = await request({
     url: API_BASE_URL + "/data/numericalProjection",
     method: "POST",
@@ -20,10 +23,21 @@ export const getNumericalPrediction = async (
     }),
   });
   if (response.ok) {
-    toggleLoading(false)(store.dispatch);
     return response.json();
   } else {
-    toggleLoading(false)(store.dispatch);
     return Promise.reject("No data found");
   }
 };
+
+export const getCourses = async (): Promise<ValidCourses[]>  => {
+    const response = await request({
+        url: API_BASE_URL + "/courses/valid",
+        method: "GET"
+    });
+    if (response.ok){
+        return response.json();
+    }
+    else{
+        return Promise.reject("Invalid data");
+    }
+}

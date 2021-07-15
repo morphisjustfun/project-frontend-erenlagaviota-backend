@@ -6,8 +6,11 @@ export enum loginType {
 }
 
 export interface loginState {
-    authenticated: boolean,
+    authenticated: {
+        authenticated: boolean;
+        waiting: boolean;
+    },
     currentUser: any,
-    loading: false,
+    loading: boolean,
     imageUrl: string
 }
