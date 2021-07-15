@@ -2,8 +2,9 @@ import { API_BASE_URL } from "../constants";
 import request from "./securityConfig";
 
 
-interface NumericalPrediction {
+export interface NumericalPrediction {
   numericalProjection: number;
+  codcurso: string;
 }
 
 export interface ValidCourses {
@@ -23,7 +24,12 @@ export const getNumericalPrediction = async (
     }),
   });
   if (response.ok) {
-    return response.json();
+    return response.json().then((value) => {
+        return {
+            numericalProjection: value.numericalProjection,
+            codcurso: curso
+        };
+    });
   } else {
     return Promise.reject("No data found");
   }

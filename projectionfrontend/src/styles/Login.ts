@@ -18,7 +18,7 @@ z-index : -1;
 width: 100%;
 height:100%;
 opacity: 0.5;
-filter: opacity(0.5) brightness(0.20);
+filter: opacity(0.5) brightness(0.80);
 object-fit:cover;
 `
 

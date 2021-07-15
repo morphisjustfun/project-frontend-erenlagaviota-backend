@@ -4,16 +4,25 @@ import { loginState } from "../store/action-types/loginType";
 import {
   getCourses,
   getNumericalPrediction,
+  NumericalPrediction,
   ValidCourses,
 } from "../business/request/dataApi";
-import styled from "styled-components";
 import "../style.css";
 import { Redirect } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/reducers";
-import { NavBarDiv, TitleDiv } from "../styles/Projection";
+import {
+  HeaderDiv,
+  NavBarDiv,
+  ResultDiv,
+  ResultsDiv,
+  TitleDiv,
+} from "../styles/Projection";
 import DataTable from "react-data-table-component";
+import Modal from "react-modal";
+
+Modal.setAppElement("#root");
 
 const Projection = (): JSX.Element => {
   const loginState = useSelector(
@@ -23,11 +32,7 @@ const Projection = (): JSX.Element => {
 
   const { logIn } = bindActionCreators(loginActionCreators, dispatch);
 
-  const cursoPicked: RefObject<HTMLInputElement> = useRef(null);
-
-  const [cursoResult, setCursoResult] = useState("");
-  const [loading, setLoading] = useState(false);
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [coursesValid, setCoursesValid] = useState([] as ValidCourses[]);
   const [coursesMirror, setCoursesMirror] = useState([] as ValidCourses[]);
 
@@ -64,71 +69,20 @@ const Projection = (): JSX.Element => {
   } else {
     return (
       <div>
-        <NavBar imageUrl={loginState.imageUrl} role={loginState.currentUser.role} email={loginState.currentUser.email}/>
-        <DataFrame courses={coursesMirror}/>
+        <NavBar
+          imageUrl={loginState.imageUrl}
+          role={loginState.currentUser.role}
+          email={loginState.currentUser.email}
+        />
+        <DataFrame courses={coursesMirror} />
       </div>
-      // {
-      //   <div className="mt-2">
-      //     <NavBar>
-      //       <div></div>
-      //       <h1 className="title is-1 has-text-centered mt-2">
-      //         {" "}
-      //         Demo projection{" "}
-      //       </h1>
-      //       {loginState.imageUrl !== "" ? (
-      //         <figure className="image is-64x64">
-      //           <img
-      //             className="is-rounded"
-      //             src={loginState.imageUrl}
-      //             alt="Not found"
-      //           />
-      //         </figure>
-      //       ) : null}
-      //     </NavBar>
-      //     <div className="ml-4 mr-4">
-      //       {
-      //         //<h1 className="title is-1 has-text-centered"> Authenticated: {state.authenticated.toString()} </h1>
-      //       }
-      //       {loginState.authenticated ? (
-      //         <div className="columns is-vcentered is-centered">
-      //           <div className="column is-half">
-      //             <InputBar>
-      //               <input
-      //                 className="input"
-      //                 type="text"
-      //                 placeholder="Curso"
-      //                 ref={cursoPicked}
-      //               />
-      //               <button
-      //                 className={`button mt-5 ${loading ? "is-loading" : ""}`}
-      //                 onClick={async () => {
-      //                   setLoading(true);
-      //                   const respuesta = await getNumericalPrediction(
-      //                     cursoPicked.current!.value
-      //                   );
-      //                   setCursoResult(respuesta.numericalProjection.toString());
-      //                   setLoading(false);
-      //                 }}
-      //               >
-      //                 Calcular
-      //               </button>
-      //             </InputBar>
-      //           </div>
-      //         </div>
-      //       ) : null}
-      //       {cursoResult !== "" ? (
-      //         <h1 className="title is-1 has-text-centered">{cursoResult}</h1>
-      //       ) : null}
-      //     </div>
-      //   </div>
-      //   }
     );
   }
 };
 
 export default Projection;
 
-const NavBar = (props: { imageUrl: string, role:string, email:string }) => (
+const NavBar = (props: { imageUrl: string; role: string; email: string }) => (
   <NavBarDiv>
     <TitleDiv>
       <h1 className="title is-1">Sistema de proyecciones</h1>
@@ -147,22 +101,66 @@ const NavBar = (props: { imageUrl: string, role:string, email:string }) => (
   </NavBarDiv>
 );
 
-const DataFrame = (props: {courses: ValidCourses[]}) => {
+const DataFrame = (props: { courses: ValidCourses[] }) => {
+  const [selectedCourses, setSelectedCourses] = useState(
+    [] as { codcurso: string; name: string }[]
+  );
+  const ButtonContainer = () => {
+    const [modalIsOpen, setIsOpen] = React.useState(false);
+    const modalStyle = {
+      content: {
+        top: "50%",
+        left: "50%",
+        right: "auto",
+        bottom: "auto",
+        marginRight: "-50%",
+        transform: "translate(-50%, -50%)",
+      },
+    };
+    return (
+      <div className="mb-3 has-text-centered">
+        <button
+          className="button is-info"
+          onClick={() => {
+            if (selectedCourses.length === 0) {
+              alert("No hay cursos seleccionados");
+            } else {
+              setIsOpen(true);
+            }
+          }}
+        >
+          CALCULAR PROYECCIÓN
+        </button>
+        <Modal
+          isOpen={modalIsOpen}
+          onRequestClose={() => setIsOpen(false)}
+          style={modalStyle}
+          contentLabel="Proyección"
+        >
+          <div className="container">
+            <ResultView selectedCourses={selectedCourses}></ResultView>
+          </div>
+        </Modal>
+      </div>
+    );
+  };
   const columns = [
     {
       name: "Código",
-      selector: (row:any) => row['codcurso'],
+      selector: (row: any) => row["codcurso"],
       sortable: true,
     },
     {
       name: "Nombre",
-      selector: (row:any) => row['name'],
+      selector: (row: any) => row["name"],
       sortable: true,
+      grow: 2,
     },
     {
       name: "Departamento",
-      selector: (row:any) => row['department'],
+      selector: (row: any) => row["department"],
       sortable: true,
+      grow: 2,
     },
   ];
   const paginationOptions = {
@@ -173,6 +171,7 @@ const DataFrame = (props: {courses: ValidCourses[]}) => {
   };
   return (
     <div className="mt-6">
+      <ButtonContainer />
       <DataTable
         columns={columns}
         data={props.courses}
@@ -180,7 +179,85 @@ const DataFrame = (props: {courses: ValidCourses[]}) => {
         pagination
         paginationComponentOptions={paginationOptions}
         responsive
+        selectableRows
+        contextMessage={{
+          plural: "cursos",
+          singular: "curso",
+          message: "selecccionados",
+        }}
+        onSelectedRowsChange={(event) => {
+          setSelectedCourses(
+            event.selectedRows.map((value) => {
+              return { name: value.name, codcurso: value.codcurso };
+            })
+          );
+        }}
+        noDataComponent={
+          <div style={{ padding: "24px" }}>No hay registros</div>
+        }
       />
     </div>
+  );
+};
+
+const ResultView = (props: {
+  selectedCourses: { codcurso: string; name: string }[];
+}) => {
+  const [processedData, setProcessedData] = useState(
+    [] as NumericalPrediction[]
+  );
+  useEffect(() => {
+    const getPrediction = async () => {
+      const request = await Promise.all(
+        props.selectedCourses.map((value) => {
+          return getNumericalPrediction(value.codcurso);
+        })
+      );
+      setProcessedData(request);
+    };
+    getPrediction();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return (
+    <ResultsDiv>
+      <React.Fragment>
+        <HeaderDiv className="pb-2">
+          <h1 className="title is-3 has-text-centered">Nombre</h1>
+        </HeaderDiv>
+        <HeaderDiv className="pb-2">
+          <h2 className="title is-4 has-text-centered">Código</h2>
+        </HeaderDiv>
+        <HeaderDiv className="pb-2">
+          <h2 className="title is-4 has-text-centered">Proyección</h2>
+        </HeaderDiv>
+      </React.Fragment>
+      {props.selectedCourses.map((value) => {
+        return (
+          <React.Fragment key={value.codcurso}>
+            <ResultDiv>
+              <h1 className="subtitle is-5 has-text-centered">{value.name}</h1>
+            </ResultDiv>
+            <ResultDiv>
+              <h2 className="subtitle is-6 has-text-centered">
+                {value.codcurso}
+              </h2>
+            </ResultDiv>
+            <ResultDiv>
+              {processedData.length === 0 ? (
+                <h2 className="subtitle is-6 has-text-centered">Cargando</h2>
+              ) : (
+                <h2 className="subtitle is-6 has-text-centered">
+                  {
+                    processedData.filter(
+                      (data) => data.codcurso === value.codcurso
+                    )[0].numericalProjection
+                  }
+                </h2>
+              )}
+            </ResultDiv>
+          </React.Fragment>
+        );
+      })}
+    </ResultsDiv>
   );
 };
