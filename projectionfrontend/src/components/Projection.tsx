@@ -114,6 +114,8 @@ const DataFrame = (props: { courses: ValidCourses[] }) => {
         right: "auto",
         bottom: "auto",
         marginRight: "-50%",
+        overflow: "auto",
+        height: "90%",
         transform: "translate(-50%, -50%)",
       },
     };
