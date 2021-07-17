@@ -7,10 +7,14 @@ here https://github.com/vercel/next-plugins/tree/master/packages/next-sass*/
 });
 module.exports = {
   /* Add Your Scss File Folder Path Here */
-typescript:{
-    ignoreBuildErrors:true,
-},
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   sassOptions: {
     includePaths: [path.join(__dirname, "styles")],
+  },
+  images: {
+    loader: "imgix",
+    path: "",
   },
 };
