@@ -1,4 +1,3 @@
-import config from "../next.config"
 import Document, { Head, Main, NextScript, Html } from "next/document";
 // Import styled components ServerStyleSheet
 import { ServerStyleSheet } from "styled-components";
@@ -25,7 +24,7 @@ export default class MyDocument extends Document {
     return (
       <Html>
         <Head>
-        <base href={config.basePath + "/"}/>
+        <base href="/app-sec02-group03/"/>
           {this.props.styleTags}
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
