@@ -8,8 +8,8 @@ function App() {
   return (
     <Router basename={process.env.PUBLIC_URL}>
       <Switch>
-        <Route exact path="/" component={Login}></Route>
         <Route path="/projection" component={Projection}></Route>
+        <Route exact path="/" component={Login}></Route>
         <Route
           path="/oauth2/redirect"
           component={OAuth2RedirectHandler}
