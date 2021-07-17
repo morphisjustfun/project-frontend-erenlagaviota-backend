@@ -17,4 +17,14 @@ module.exports = {
     loader: "imgix",
     path: "",
   },
+  exportPathMap: async function (
+    defaultPathMap,
+    { dev, dir, outDir, distDir, buildId }
+  ) {
+    return {
+      "/": { page: "/" },
+      "/projection": { page: "/projection" },
+      "/oauth2/redirect": { page: "/oauth2/redirect" },
+    };
+  },
 };
