@@ -1,12 +1,11 @@
 import exportConfigDev from "./dev";
-import exportConfigProd from "./prod";
 
 let config: typeof exportConfigDev = { redirectUri: "", apiBaseUrl: "" };
 
-if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "test") {
-  config = exportConfigDev;
-} else {
-  config = exportConfigProd;
-}
+config.redirectUri = "https://cs.mrg.com.pe/app-sec02-group03/oauth2/redirect";
+config.apiBaseUrl = "https://api.cs.mrg.com.pe/api-sec02-group03";
+
+// config.redirectUri = "http://localhost:3000/oauth2/redirect";
+// config.apiBaseUrl = "http://localhost:8080";
 
 export default config;
