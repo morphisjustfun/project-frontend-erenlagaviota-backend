@@ -1,6 +1,6 @@
-import { ACCESS_TOKEN } from "../../businesses/constants";
+import { ACCESS_TOKEN } from "../../../businesses/constants";
 import React from "react";
-import Redirect from "../../components/Redirect";
+import Redirect from "../../../components/Redirect";
 import { useRouter } from "next/dist/client/router";
 
 const redirectAndLogin = (token: string): JSX.Element => {
