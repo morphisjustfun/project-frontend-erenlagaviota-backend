@@ -38,3 +38,21 @@ export const HeaderDiv = styled.div`
   align-items: center;
   border-bottom: 1px dotted #000;
 `;
+
+export const FilterDiv = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 3rem;
+`;
+
+export const FilterElementDiv = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+`;
+
+export const FieldElementDiv = styled.div`
+width: 100%;
+`

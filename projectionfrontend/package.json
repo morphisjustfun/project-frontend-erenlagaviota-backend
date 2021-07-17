@@ -16,6 +16,7 @@
     "@types/redux-thunk": "^2.1.0",
     "@types/styled-components": "^5.1.11",
     "bulma": "^0.9.3",
+    "fuse.js": "^6.4.6",
     "node-sass": "^6.0.1",
     "react": "^17.0.2",
     "react-data-table-component": "^7.0.0-rc2",

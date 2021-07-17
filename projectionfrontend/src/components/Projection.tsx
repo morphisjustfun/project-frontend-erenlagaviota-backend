@@ -13,6 +13,9 @@ import { bindActionCreators } from "redux";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/reducers";
 import {
+    FieldElementDiv,
+  FilterDiv,
+  FilterElementDiv,
   HeaderDiv,
   NavBarDiv,
   ResultDiv,
@@ -21,6 +24,7 @@ import {
 } from "../styles/Projection";
 import DataTable from "react-data-table-component";
 import Modal from "react-modal";
+import Fuse from "fuse.js";
 
 Modal.setAppElement("#root");
 
@@ -54,7 +58,7 @@ const Projection = (): JSX.Element => {
   }, []);
 
   if (loginState.authenticated.waiting) {
-    return <h1>loading</h1>;
+    return <h1>Loading</h1>;
   } else if (
     !loginState.authenticated.waiting &&
     !loginState.authenticated.authenticated
@@ -74,7 +78,17 @@ const Projection = (): JSX.Element => {
           role={loginState.currentUser.role}
           email={loginState.currentUser.email}
         />
-        <DataFrame courses={coursesMirror} />
+        <DataFrame
+          courses={coursesMirror}
+          coursesHandler={setCoursesMirror}
+          coursesMirror={coursesMirror}
+          coursesValid={coursesValid}
+        />
+        <Filter
+          coursesHandler={setCoursesMirror}
+          coursesMirror={coursesMirror}
+          coursesValid={coursesValid}
+        />
       </div>
     );
   }
@@ -101,11 +115,20 @@ const NavBar = (props: { imageUrl: string; role: string; email: string }) => (
   </NavBarDiv>
 );
 
-const DataFrame = (props: { courses: ValidCourses[] }) => {
+const DataFrame = (props: {
+  courses: ValidCourses[];
+  coursesHandler: React.Dispatch<React.SetStateAction<ValidCourses[]>>;
+  coursesMirror: ValidCourses[];
+  coursesValid: ValidCourses[];
+}) => {
   const [selectedCourses, setSelectedCourses] = useState(
     [] as { codcurso: string; name: string }[]
   );
-  const ButtonContainer = () => {
+  const ButtonContainer = (props: {
+    coursesHandler: React.Dispatch<React.SetStateAction<ValidCourses[]>>;
+    coursesMirror: ValidCourses[];
+    coursesValid: ValidCourses[];
+  }) => {
     const [modalIsOpen, setIsOpen] = React.useState(false);
     const modalStyle = {
       content: {
@@ -173,7 +196,11 @@ const DataFrame = (props: { courses: ValidCourses[] }) => {
   };
   return (
     <div className="mt-6">
-      <ButtonContainer />
+      <ButtonContainer
+        coursesHandler={props.coursesHandler}
+        coursesValid={props.coursesValid}
+        coursesMirror={props.coursesValid}
+      />
       <DataTable
         columns={columns}
         data={props.courses}
@@ -262,4 +289,73 @@ const ResultView = (props: {
       })}
     </ResultsDiv>
   );
+};
+
+const Filter = (props: {
+  coursesHandler: React.Dispatch<React.SetStateAction<ValidCourses[]>>;
+  coursesValid: ValidCourses[];
+  coursesMirror: ValidCourses[];
+}) => {
+  const inputNombre: RefObject<HTMLInputElement> = useRef(null);
+  const inputCodigo: RefObject<HTMLInputElement> = useRef(null);
+  const inputDepartamento: RefObject<HTMLInputElement> = useRef(null);
+  return (
+    <FilterDiv className="mt-6">
+      <FilterElementDiv>
+        <FieldElementDiv className="field">
+          <label className="label"> Nombre del curso</label>
+          <div className="controls">
+            <input
+              ref={inputNombre}
+              className="input"
+              type="text"
+              placeholder="Nombre del curso"
+              onChange={(e) => {
+                inputCodigo.current!.value = "";
+                e.preventDefault();
+                const result = FilterName(
+                  props.coursesValid,
+                  { keys: ["name"] },
+                  e.target.value
+                );
+                props.coursesHandler(result);
+              }}
+            />
+          </div>
+        </FieldElementDiv>
+      </FilterElementDiv>
+      <FilterElementDiv>
+        <FieldElementDiv className="field">
+          <label className="label">Código del curso</label>
+          <div className="controls">
+            <input
+              ref={inputCodigo}
+              className="input"
+              type="text"
+              placeholder="Código del curso"
+              onChange={(e) => {
+                inputNombre.current!.value = "";
+                e.preventDefault();
+                const result = FilterName(
+                  props.coursesValid,
+                  { keys: ["codcurso"] },
+                  e.target.value
+                );
+                props.coursesHandler(result);
+              }}
+            />
+          </div>
+        </FieldElementDiv>
+      </FilterElementDiv>
+    </FilterDiv>
+  );
+};
+
+const FilterName = (
+  list: ValidCourses[],
+  options: Fuse.IFuseOptions<ValidCourses>,
+  input: string
+): ValidCourses[] => {
+  const FuseSearch = new Fuse(list, options);
+  return FuseSearch.search(input).map((result) => result.item);
 };
