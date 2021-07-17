@@ -63,9 +63,7 @@ const Projection = (): JSX.Element => {
   ) {
     return (
       <Redirect
-        to={{
-          pathname: "/",
-        }}
+        to="/"
       />
     );
   } else {
@@ -101,7 +99,8 @@ const NavBar = (props: { imageUrl: string; role: string; email: string }) => (
     </TitleDiv>
     <TitleDiv>
       <figure className="image is-128x128">
-        <Image className="is-rounded" src={props.imageUrl} alt="Not found" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="is-rounded" src={props.imageUrl} alt="Not found"/>
       </figure>
     </TitleDiv>
     <TitleDiv>
