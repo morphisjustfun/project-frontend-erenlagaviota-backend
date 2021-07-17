@@ -101,7 +101,7 @@ const NavBar = (props: { imageUrl: string; role: string; email: string }) => (
     </TitleDiv>
     <TitleDiv>
       <figure className="image is-128x128">
-        <img className="is-rounded" src={props.imageUrl} alt="Not found" />
+        <Image className="is-rounded" src={props.imageUrl} alt="Not found" />
       </figure>
     </TitleDiv>
     <TitleDiv>
