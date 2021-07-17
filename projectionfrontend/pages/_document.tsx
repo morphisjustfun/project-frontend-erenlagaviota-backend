@@ -1,4 +1,4 @@
-const config = require("../next.config")
+import config from "../next.config"
 import Document, { Head, Main, NextScript, Html } from "next/document";
 // Import styled components ServerStyleSheet
 import { ServerStyleSheet } from "styled-components";
