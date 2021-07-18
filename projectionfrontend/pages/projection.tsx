@@ -1,8 +1,16 @@
-import { RefObject, useEffect, useRef, useState } from "react";
+import {
+  forwardRef,
+  Fragment,
+  MutableRefObject,
+  ReactInstance,
+  RefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { loginActionCreators } from "../store";
 import { loginState } from "../store/action-types/loginType";
 import Redirect from "../components/Redirect";
-import Image from "next/image"
 import {
   getCourses,
   getNumericalPrediction,
@@ -13,7 +21,7 @@ import { bindActionCreators } from "redux";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/reducers";
 import {
-    FieldElementDiv,
+  FieldElementDiv,
   FilterDiv,
   FilterElementDiv,
   HeaderDiv,
@@ -26,6 +34,8 @@ import DataTable from "react-data-table-component";
 import Modal from "react-modal";
 import Fuse from "fuse.js";
 import React from "react";
+import CsvDownload from "react-json-to-csv";
+import { useReactToPrint } from "react-to-print";
 
 const Projection = (): JSX.Element => {
   const loginState = useSelector(
@@ -61,11 +71,7 @@ const Projection = (): JSX.Element => {
     !loginState.authenticated.waiting &&
     !loginState.authenticated.authenticated
   ) {
-    return (
-      <Redirect
-        to="/"
-      />
-    );
+    return <Redirect to="/" />;
   } else {
     return (
       <div>
@@ -100,7 +106,7 @@ const NavBar = (props: { imageUrl: string; role: string; email: string }) => (
     <TitleDiv>
       <figure className="image is-128x128">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="is-rounded" src={props.imageUrl} alt="Not found"/>
+        <img className="is-rounded" src={props.imageUrl} alt="Not found" />
       </figure>
     </TitleDiv>
     <TitleDiv>
@@ -134,7 +140,7 @@ const DataFrame = (props: {
         right: "auto",
         bottom: "auto",
         marginRight: "-50%",
-       overflow: "auto",
+        overflow: "auto",
         height: "90%",
         transform: "translate(-50%, -50%)",
       },
@@ -158,7 +164,7 @@ const DataFrame = (props: {
           onRequestClose={() => setIsOpen(false)}
           style={modalStyle}
           contentLabel="Proyección"
-          ariaHideApp
+          ariaHideApp={false}
         >
           <div className="container">
             <ResultView selectedCourses={selectedCourses}></ResultView>
@@ -230,62 +236,52 @@ const DataFrame = (props: {
 const ResultView = (props: {
   selectedCourses: { codcurso: string; name: string }[];
 }) => {
+  const componentRef = useRef() as RefObject<ReactInstance>;
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
   const [processedData, setProcessedData] = useState(
     [] as NumericalPrediction[]
   );
+  let mergedResult: MutableRefObject<
+    ({
+      codcurso: string;
+      name: string;
+    } & NumericalPrediction)[]
+  > = useRef([]);
   useEffect(() => {
     const getPrediction = async () => {
-      const request = await Promise.all(
+      const jsonData = await Promise.all(
         props.selectedCourses.map((value) => {
           return getNumericalPrediction(value.codcurso);
         })
       );
-      setProcessedData(request);
+      mergedResult.current = props.selectedCourses.map((x) =>
+        Object.assign(
+          x,
+          jsonData.find((y) => y.codcurso == x.codcurso)
+        )
+      );
+      setProcessedData(jsonData);
     };
     getPrediction();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <ResultsDiv>
-      <React.Fragment>
-        <HeaderDiv className="pb-2">
-          <h1 className="title is-3 has-text-centered">Nombre</h1>
-        </HeaderDiv>
-        <HeaderDiv className="pb-2">
-          <h2 className="title is-4 has-text-centered">Código</h2>
-        </HeaderDiv>
-        <HeaderDiv className="pb-2">
-          <h2 className="title is-4 has-text-centered">Proyección</h2>
-        </HeaderDiv>
-      </React.Fragment>
-      {props.selectedCourses.map((value) => {
-        return (
-          <React.Fragment key={value.codcurso}>
-            <ResultDiv>
-              <h1 className="subtitle is-5 has-text-centered">{value.name}</h1>
-            </ResultDiv>
-            <ResultDiv>
-              <h2 className="subtitle is-6 has-text-centered">
-                {value.codcurso}
-              </h2>
-            </ResultDiv>
-            <ResultDiv>
-              {processedData.length === 0 ? (
-                <h2 className="subtitle is-6 has-text-centered">Cargando</h2>
-              ) : (
-                <h2 className="subtitle is-6 has-text-centered">
-                  {
-                    processedData.filter(
-                      (data) => data.codcurso === value.codcurso
-                    )[0].numericalProjection
-                  }
-                </h2>
-              )}
-            </ResultDiv>
-          </React.Fragment>
-        );
-      })}
-    </ResultsDiv>
+    <Fragment>
+      <div className="buttons is-centered">
+        <CsvDownload data={mergedResult.current} className="button" />
+        <button className="button" onClick={handlePrint}>
+          Imprimir
+        </button>
+      </div>
+      <ResultsView
+        ref={componentRef}
+        length={processedData.length}
+        processedData={processedData}
+        selectedCourses={props.selectedCourses}
+      ></ResultsView>
+    </Fragment>
   );
 };
 
@@ -356,4 +352,58 @@ const FilterName = (
 ): ValidCourses[] => {
   const FuseSearch = new Fuse(list, options);
   return FuseSearch.search(input).map((result) => result.item);
-}; 
+};
+
+const ResultsView = forwardRef<
+  any,
+  {
+    length: number;
+    processedData: NumericalPrediction[];
+    selectedCourses: { codcurso: string; name: string }[];
+  }
+>((props, ref) => {
+  return (
+    <ResultsDiv ref={ref}>
+      <React.Fragment>
+        <HeaderDiv className="pb-2">
+          <h1 className="title is-3 has-text-centered">Nombre</h1>
+        </HeaderDiv>
+        <HeaderDiv className="pb-2">
+          <h2 className="title is-4 has-text-centered">Código</h2>
+        </HeaderDiv>
+        <HeaderDiv className="pb-2">
+          <h2 className="title is-4 has-text-centered">Proyección</h2>
+        </HeaderDiv>
+      </React.Fragment>
+      {props.selectedCourses.map((value) => {
+        return (
+          <React.Fragment key={value.codcurso}>
+            <ResultDiv>
+              <h1 className="subtitle is-5 has-text-centered">{value.name}</h1>
+            </ResultDiv>
+            <ResultDiv>
+              <h2 className="subtitle is-6 has-text-centered">
+                {value.codcurso}
+              </h2>
+            </ResultDiv>
+            <ResultDiv>
+              {props.length === 0 ? (
+                <h2 className="subtitle is-6 has-text-centered">Cargando</h2>
+              ) : (
+                <h2 className="subtitle is-6 has-text-centered">
+                  {
+                    props.processedData.filter(
+                      (data) => data.codcurso === value.codcurso
+                    )[0].numericalProjection
+                  }
+                </h2>
+              )}
+            </ResultDiv>
+          </React.Fragment>
+        );
+      })}
+    </ResultsDiv>
+  );
+});
+
+ResultsView.displayName = "ResultsView";
