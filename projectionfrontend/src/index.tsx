@@ -4,6 +4,14 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { Provider } from "react-redux";
 import { store } from "./store";
+import {createBrowserHistory} from "history"
+
+const history = createBrowserHistory();
+
+const path = (/#!(\/.*)$/.exec(history.location.hash) || [])[1];
+if (path) {
+  history.replace(path);
+}
 
 ReactDOM.render(
   <React.StrictMode>
