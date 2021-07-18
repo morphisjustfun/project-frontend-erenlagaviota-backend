@@ -8,7 +8,7 @@
     "build": "next build && next export",
     "start": "next start",
     "lint": "next lint",
-    "deploy": "aws s3 sync out/ s3://projectionfrontend"
+    "deploy": "next build && next export && ./deploy.sh"
   },
   "dependencies": {
     "@types/react-modal": "^3.12.1",
