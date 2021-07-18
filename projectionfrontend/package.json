@@ -7,13 +7,13 @@
     "dev": "next dev",
     "build": "next build && next export",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "deploy": "aws s3 sync out/ s3://projectionfrontend"
   },
   "dependencies": {
     "@types/react-modal": "^3.12.1",
     "@types/redux-thunk": "^2.1.0",
     "@types/styled-components": "^5.1.11",
-    "@zeit/next-sass": "^1.0.1",
     "babel-plugin-styled-components": "^1.13.2",
     "bulma": "^0.9.3",
     "fuse.js": "^6.4.6",
