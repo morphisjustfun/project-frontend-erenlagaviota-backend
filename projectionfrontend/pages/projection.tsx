@@ -37,6 +37,14 @@ import React from "react";
 import CsvDownload from "react-json-to-csv";
 import { useReactToPrint } from "react-to-print";
 
+const Normalize = (target: string) => {
+  return target
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replaceAll(" ", "")
+    .toLowerCase();
+};
+
 const Projection = (): JSX.Element => {
   const loginState = useSelector(
     (state: RootState) => state.login
@@ -49,10 +57,18 @@ const Projection = (): JSX.Element => {
   const [coursesMirror, setCoursesMirror] = useState([] as ValidCourses[]);
 
   useEffect(() => {
-    const coursesRequest = async () => {
-      const coursesResponse = await getCourses();
-      setCoursesValid(coursesResponse);
-      setCoursesMirror(coursesResponse);
+    const coursesRequest = () => {
+      /* @ts-ignore */
+      logIn().then(async (response) => {
+        let coursesResponse = await getCourses();
+        if (response.role !== "general") {
+          coursesResponse = coursesResponse.filter(
+            (value) => Normalize(value.department) === Normalize(response.role)
+          );
+        }
+        setCoursesValid(coursesResponse);
+        setCoursesMirror(coursesResponse);
+      });
     };
     document.documentElement.style.backgroundColor = "F1F1F1";
     document.documentElement.style.padding = "0";
@@ -60,7 +76,6 @@ const Projection = (): JSX.Element => {
     document.documentElement.style.boxSizing = "border-box";
     document.documentElement.style.overflow = "visible";
     document.body.style.fontFamily = "'Poppins', sans-serif";
-    logIn();
     coursesRequest();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -270,7 +285,9 @@ const ResultView = (props: {
   return (
     <Fragment>
       <div className="buttons is-centered">
-        <CsvDownload data={mergedResult.current} className="button" />
+        <CsvDownload data={mergedResult.current} className="button" filename="Cursos_Resultados.csv">
+        Descargar resultados en CSV
+        </CsvDownload>
         <button className="button" onClick={handlePrint}>
           Imprimir
         </button>
@@ -292,7 +309,6 @@ const Filter = (props: {
 }) => {
   const inputNombre: RefObject<HTMLInputElement> = useRef(null);
   const inputCodigo: RefObject<HTMLInputElement> = useRef(null);
-  const inputDepartamento: RefObject<HTMLInputElement> = useRef(null);
   return (
     <FilterDiv className="mt-6">
       <FilterElementDiv>
