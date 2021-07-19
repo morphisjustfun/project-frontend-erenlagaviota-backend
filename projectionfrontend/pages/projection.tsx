@@ -2,7 +2,6 @@ import React, {
   forwardRef,
   Fragment,
   MutableRefObject,
-  ReactInstance,
   RefObject,
   useEffect,
   useRef,
