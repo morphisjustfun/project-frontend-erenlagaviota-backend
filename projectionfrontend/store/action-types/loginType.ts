@@ -5,7 +5,7 @@ export enum loginType {
     GET_IMAGEURL = "get_imageurl"
 }
 
-export interface loginState {
+export interface LoginState {
     authenticated: {
         authenticated: boolean;
         waiting: boolean;

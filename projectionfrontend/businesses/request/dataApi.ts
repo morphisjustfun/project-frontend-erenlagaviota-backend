@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "../constants";
-import request from "./securityConfig";
+import request from "./request";
 
 
 export interface NumericalPrediction {

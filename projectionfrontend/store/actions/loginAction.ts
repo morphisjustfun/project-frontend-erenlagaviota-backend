@@ -1,15 +1,15 @@
 import { loginType } from "../action-types/loginType";
 
-interface toggle_loading {
+interface ToggleLoading {
   type: loginType.TOGGLE_LOADING;
   loading: boolean;
 }
 
-interface log_out {
+interface LogOut {
   type: loginType.LOG_OUT;
 }
 
-interface log_in {
+interface LogIn {
   type: loginType.LOG_IN;
   currentUser: any;
   authenticated: {
@@ -19,9 +19,9 @@ interface log_in {
   imageUrl: string;
 }
 
-interface get_imageUrl {
+interface GetImageUrl {
   type: loginType.GET_IMAGEURL;
   imageUrl: string;
 }
 
-export type loginAction = toggle_loading | log_out | log_in | get_imageUrl;
+export type loginAction = ToggleLoading | LogOut | LogIn | GetImageUrl;

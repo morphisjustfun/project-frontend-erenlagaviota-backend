@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { bindActionCreators } from "redux";
 import Redirect from "../components/Redirect";
 import { loginActionCreators } from "../store";
-import { loginState } from "../store/action-types/loginType";
+import { LoginState } from "../store/action-types/loginType";
 import { RootState } from "../store/reducers";
 import {
   LoginBackgroundImg,
@@ -17,7 +17,7 @@ import GoogleButton from "react-google-button";
 import {GOOGLE_AUTH_URL} from "../businesses/constants";
 
 const Login = () => {
-  const state = useSelector((state: RootState) => state.login) as loginState;
+  const state = useSelector((stateLog: RootState) => stateLog.login) as LoginState;
   const dispatch = useDispatch();
   const { logIn } = bindActionCreators(loginActionCreators, dispatch);
 

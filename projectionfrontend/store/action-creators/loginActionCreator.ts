@@ -22,36 +22,6 @@ export const logOut = () => {
   };
 };
 
-// export const logIn = () => {
-//   return (dispatch: Dispatch<loginAction>) => {
-//     getCurrentUser().then(async (response) => {
-//       if (response.ok) {
-//         const json = await response.json();
-//         dispatch({
-//           type: loginType.LOG_IN,
-//           authenticated: {
-//             authenticated: true,
-//             waiting: false,
-//           },
-//           currentUser: json,
-//           imageUrl: json.imageUrl,
-//         });
-//       } else {
-//         localStorage.removeItem(ACCESS_TOKEN);
-//         dispatch({
-//           type: loginType.LOG_IN,
-//           authenticated: {
-//             authenticated: false,
-//             waiting: false,
-//           },
-//           currentUser: null,
-//           imageUrl: "",
-//         });
-//       }
-//     });
-//   };
-// };
-
 export const logIn = () => {
   return (dispatch: Dispatch<loginAction>) => {
     return new Promise((resolve, reject) => {

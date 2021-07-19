@@ -1,4 +1,4 @@
-import {
+import React, {
   forwardRef,
   Fragment,
   MutableRefObject,
@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import { loginActionCreators } from "../store";
-import { loginState } from "../store/action-types/loginType";
+import { LoginState } from "../store/action-types/loginType";
 import Redirect from "../components/Redirect";
 import {
   getCourses,
@@ -33,7 +33,6 @@ import {
 import DataTable from "react-data-table-component";
 import Modal from "react-modal";
 import Fuse from "fuse.js";
-import React from "react";
 import CsvDownload from "react-json-to-csv";
 import { useReactToPrint } from "react-to-print";
 
@@ -46,9 +45,9 @@ const Normalize = (target: string) => {
 };
 
 const Projection = (): JSX.Element => {
-  const loginState = useSelector(
+  const loginS = useSelector(
     (state: RootState) => state.login
-  ) as loginState;
+  ) as LoginState;
   const dispatch = useDispatch();
 
   const { logIn } = bindActionCreators(loginActionCreators, dispatch);
@@ -80,28 +79,28 @@ const Projection = (): JSX.Element => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (loginState.authenticated.waiting) {
+  if (loginS.authenticated.waiting) {
     return <h1>Loading</h1>;
   } else if (
-    !loginState.authenticated.waiting &&
-    !loginState.authenticated.authenticated
+    !loginS.authenticated.waiting &&
+    !loginS.authenticated.authenticated
   ) {
     return <Redirect to="/" />;
   } else {
     return (
       <div>
         <NavBar
-          imageUrl={loginState.imageUrl}
-          role={loginState.currentUser.role}
-          email={loginState.currentUser.email}
+          imageUrl={loginS.imageUrl}
+          role={loginS.currentUser.role}
+          email={loginS.currentUser.email}
         />
-        <DataFrame
-          courses={coursesMirror}
+        <Filter
           coursesHandler={setCoursesMirror}
           coursesMirror={coursesMirror}
           coursesValid={coursesValid}
         />
-        <Filter
+        <DataFrame
+          courses={coursesMirror}
           coursesHandler={setCoursesMirror}
           coursesMirror={coursesMirror}
           coursesValid={coursesValid}
@@ -251,9 +250,9 @@ const DataFrame = (props: {
 const ResultView = (props: {
   selectedCourses: { codcurso: string; name: string }[];
 }) => {
-  const componentRef = useRef() as RefObject<ReactInstance>;
+  const componentRef = useRef(); 
   const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
+    content: () => componentRef.current!,
   });
   const [processedData, setProcessedData] = useState(
     [] as NumericalPrediction[]
@@ -285,8 +284,12 @@ const ResultView = (props: {
   return (
     <Fragment>
       <div className="buttons is-centered">
-        <CsvDownload data={mergedResult.current} className="button" filename="Cursos_Resultados.csv">
-        Descargar resultados en CSV
+        <CsvDownload
+          data={mergedResult.current}
+          className="button"
+          filename="Cursos_Resultados.csv"
+        >
+          Descargar resultados en CSV
         </CsvDownload>
         <button className="button" onClick={handlePrint}>
           Imprimir

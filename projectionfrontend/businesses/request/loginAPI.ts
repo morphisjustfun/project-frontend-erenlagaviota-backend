@@ -1,5 +1,5 @@
 import { API_BASE_URL, ACCESS_TOKEN } from "../constants";
-import request from "./securityConfig";
+import request from "./request";
 
 export const getCurrentUser = async () : Promise<any> => {
   if (!localStorage.getItem(ACCESS_TOKEN)) {

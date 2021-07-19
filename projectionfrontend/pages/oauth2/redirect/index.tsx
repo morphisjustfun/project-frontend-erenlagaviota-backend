@@ -16,7 +16,7 @@ const OAuth2RedirectHandler = (): JSX.Element => {
   if (token) {
     return redirectAndLogin(token);
   } else {
-    console.log("usuario no definido");
+    console.log(error);
     return <Redirect to="/" />;
   }
 };

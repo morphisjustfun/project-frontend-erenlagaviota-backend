@@ -1,7 +1,7 @@
 import { loginAction } from "../actions/loginAction";
-import { loginType, loginState } from "../action-types/loginType";
+import { loginType, LoginState } from "../action-types/loginType";
 
-const initialState : loginState = {
+const initialState : LoginState = {
     authenticated: {
         authenticated: false,
         waiting: true
@@ -11,7 +11,7 @@ const initialState : loginState = {
     imageUrl: ''
 }
 
-const reducer = (state = initialState, action: loginAction) => {
+const loginReducer = (state = initialState, action: loginAction) => {
     switch (action.type){
         case loginType.TOGGLE_LOADING:
             return {...state, loading: action.loading}
@@ -27,4 +27,4 @@ const reducer = (state = initialState, action: loginAction) => {
 }
 
 
-export default reducer;
+export default loginReducer;
