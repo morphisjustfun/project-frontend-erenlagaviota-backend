@@ -14,7 +14,8 @@ export interface ValidCourses {
 }
 
 export const getNumericalPrediction = async (
-  curso: string
+  curso: string,
+  abortController: AbortController
 ): Promise<NumericalPrediction> => {
   const response = await request({
     url: API_BASE_URL + "/data/numericalProjection",
@@ -22,7 +23,7 @@ export const getNumericalPrediction = async (
     body: JSON.stringify({
       course: curso,
     }),
-  });
+  }, abortController);
   if (response.ok) {
     return response.json().then((value) => {
         return {

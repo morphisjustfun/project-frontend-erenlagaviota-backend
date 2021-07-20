@@ -1,4 +1,5 @@
 import React, {
+  Dispatch,
   forwardRef,
   Fragment,
   MutableRefObject,
@@ -34,6 +35,7 @@ import Modal from "react-modal";
 import Fuse from "fuse.js";
 import CsvDownload from "react-json-to-csv";
 import { useReactToPrint } from "react-to-print";
+import SpinLoader from "../components/SpinLoader";
 
 const Normalize = (target: string) => {
   return target
@@ -44,9 +46,7 @@ const Normalize = (target: string) => {
 };
 
 const Projection = (): JSX.Element => {
-  const loginS = useSelector(
-    (state: RootState) => state.login
-  ) as LoginState;
+  const loginS = useSelector((state: RootState) => state.login) as LoginState;
   const dispatch = useDispatch();
 
   const { logIn } = bindActionCreators(loginActionCreators, dispatch);
@@ -174,13 +174,15 @@ const DataFrame = (props: {
         </button>
         <Modal
           isOpen={modalIsOpen}
-          onRequestClose={() => setIsOpen(false)}
           style={modalStyle}
           contentLabel="Proyección"
           ariaHideApp={false}
         >
           <div className="container">
-            <ResultView selectedCourses={selectedCourses}></ResultView>
+            <ResultView
+              selectedCourses={selectedCourses}
+              onClose={setIsOpen}
+            ></ResultView>
           </div>
         </Modal>
       </div>
@@ -221,7 +223,11 @@ const DataFrame = (props: {
       <DataTable
         columns={columns}
         data={props.courses}
-        title="Lista de cursos"
+        title={
+          <div className="is-title" style={{ color: "#363636" }}>
+            Lista de cursos
+          </div>
+        }
         pagination
         paginationComponentOptions={paginationOptions}
         responsive
@@ -239,7 +245,10 @@ const DataFrame = (props: {
           );
         }}
         noDataComponent={
-          <div style={{ padding: "24px" }}>No hay registros</div>
+          <div style={{ padding: "24px" }}>
+            {" "}
+            <SpinLoader />{" "}
+          </div>
         }
       />
     </div>
@@ -248,14 +257,16 @@ const DataFrame = (props: {
 
 const ResultView = (props: {
   selectedCourses: { codcurso: string; name: string }[];
+  onClose: Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const componentRef = useRef(); 
+  const componentRef = useRef();
   const handlePrint = useReactToPrint({
     content: () => componentRef.current!,
   });
   const [processedData, setProcessedData] = useState(
     [] as NumericalPrediction[]
   );
+  const abortController = new AbortController();
   let mergedResult: MutableRefObject<
     ({
       codcurso: string;
@@ -266,7 +277,7 @@ const ResultView = (props: {
     const getPrediction = async () => {
       const jsonData = await Promise.all(
         props.selectedCourses.map((value) => {
-          return getNumericalPrediction(value.codcurso);
+          return getNumericalPrediction(value.codcurso, abortController);
         })
       );
       mergedResult.current = props.selectedCourses.map((x) =>
@@ -292,6 +303,12 @@ const ResultView = (props: {
         </CsvDownload>
         <button className="button" onClick={handlePrint}>
           Imprimir
+        </button>
+        <button className="button is-danger" onClick={() => {
+        abortController.abort();
+        props.onClose(false)}
+        }>
+          Cerrar
         </button>
       </div>
       <ResultsView
@@ -384,7 +401,7 @@ const ResultsView = forwardRef<
     <ResultsDiv ref={ref}>
       <React.Fragment>
         <HeaderDiv className="pb-2">
-          <h1 className="title is-3 has-text-centered">Nombre</h1>
+          <h1 className="title is-4 has-text-centered">Nombre</h1>
         </HeaderDiv>
         <HeaderDiv className="pb-2">
           <h2 className="title is-4 has-text-centered">Código</h2>
@@ -397,7 +414,7 @@ const ResultsView = forwardRef<
         return (
           <React.Fragment key={value.codcurso}>
             <ResultDiv>
-              <h1 className="subtitle is-5 has-text-centered">{value.name}</h1>
+              <h1 className="subtitle is-6 has-text-centered">{value.name}</h1>
             </ResultDiv>
             <ResultDiv>
               <h2 className="subtitle is-6 has-text-centered">
@@ -406,7 +423,7 @@ const ResultsView = forwardRef<
             </ResultDiv>
             <ResultDiv>
               {props.length === 0 ? (
-                <h2 className="subtitle is-6 has-text-centered">Cargando</h2>
+                <SpinLoader />
               ) : (
                 <h2 className="subtitle is-6 has-text-centered">
                   {

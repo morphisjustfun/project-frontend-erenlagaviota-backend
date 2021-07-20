@@ -1,12 +1,9 @@
 import { ACCESS_TOKEN } from "../constants";
 
-interface RequestOptions {
-  url: string;
-  method: string;
-  body?: any;
-}
-
-const request = (options: RequestOptions) => {
+const request = (
+  options: RequestInit & { url: string },
+  abortController?: AbortController
+) => {
   const headers = new Headers({
     "Content-Type": "application/json",
   });
@@ -20,6 +17,9 @@ const request = (options: RequestOptions) => {
 
   const defaults = { headers: headers };
   options = { ...defaults, ...options };
+  if (abortController !== undefined) {
+    options = { ...options, signal: abortController.signal };
+  }
 
   return fetch(options.url, options);
 };
