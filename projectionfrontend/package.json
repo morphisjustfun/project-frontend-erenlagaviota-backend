@@ -11,6 +11,9 @@
     "deploy": "next build && next export && ./deploy.sh"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.35",
+    "@fortawesome/free-solid-svg-icons": "^5.15.3",
+    "@fortawesome/react-fontawesome": "^0.1.14",
     "@types/react-modal": "^3.12.1",
     "@types/redux-thunk": "^2.1.0",
     "@types/styled-components": "^5.1.11",

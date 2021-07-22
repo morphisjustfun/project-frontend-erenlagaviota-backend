@@ -4,6 +4,7 @@ import React, {
   Fragment,
   MutableRefObject,
   RefObject,
+  SetStateAction,
   useEffect,
   useRef,
   useState,
@@ -36,6 +37,8 @@ import Fuse from "fuse.js";
 import CsvDownload from "react-json-to-csv";
 import { useReactToPrint } from "react-to-print";
 import SpinLoader from "../components/SpinLoader";
+import { faAngleDown } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const Normalize = (target: string) => {
   return target
@@ -54,17 +57,20 @@ const Projection = (): JSX.Element => {
   const [coursesValid, setCoursesValid] = useState([] as ValidCourses[]);
   const [coursesMirror, setCoursesMirror] = useState([] as ValidCourses[]);
 
+  let defaultDepartment = useRef("");
+
   useEffect(() => {
     const coursesRequest = () => {
       /* @ts-ignore */
       logIn().then(async (response) => {
         let coursesResponse = await getCourses();
+        defaultDepartment.current = response.role;
+        setCoursesValid(coursesResponse);
         if (response.role !== "general") {
           coursesResponse = coursesResponse.filter(
             (value) => Normalize(value.department) === Normalize(response.role)
           );
         }
-        setCoursesValid(coursesResponse);
         setCoursesMirror(coursesResponse);
       });
     };
@@ -97,6 +103,7 @@ const Projection = (): JSX.Element => {
           coursesHandler={setCoursesMirror}
           coursesMirror={coursesMirror}
           coursesValid={coursesValid}
+          defaultDepartment={defaultDepartment.current}
         />
         <DataFrame
           courses={coursesMirror}
@@ -304,10 +311,13 @@ const ResultView = (props: {
         <button className="button" onClick={handlePrint}>
           Imprimir
         </button>
-        <button className="button is-danger" onClick={() => {
-        abortController.abort();
-        props.onClose(false)}
-        }>
+        <button
+          className="button is-danger"
+          onClick={() => {
+            abortController.abort();
+            props.onClose(false);
+          }}
+        >
           Cerrar
         </button>
       </div>
@@ -325,58 +335,171 @@ const Filter = (props: {
   coursesHandler: React.Dispatch<React.SetStateAction<ValidCourses[]>>;
   coursesValid: ValidCourses[];
   coursesMirror: ValidCourses[];
+  defaultDepartment: string;
 }) => {
-  const inputNombre: RefObject<HTMLInputElement> = useRef(null);
-  const inputCodigo: RefObject<HTMLInputElement> = useRef(null);
+  const inputCourseRef = useRef<HTMLInputElement>(null);
+  const [inputDepartment, setInputDepartment] = useState([] as ValidCourses[]);
   return (
     <FilterDiv className="mt-6">
       <FilterElementDiv>
         <FieldElementDiv className="field">
-          <label className="label"> Nombre del curso</label>
-          <div className="controls">
-            <input
-              ref={inputNombre}
-              className="input"
-              type="text"
-              placeholder="Nombre del curso"
-              onChange={(e) => {
-                inputCodigo.current!.value = "";
-                e.preventDefault();
-                const result = FilterName(
+          <label className="label"> Nombre o código del curso</label>
+          <input
+            className="input"
+            type="text"
+            ref={inputCourseRef}
+            placeholder="Nombre o código del curso"
+            onChange={(e) => {
+              e.preventDefault();
+              if (e.target.value !== "") {
+                let result = FilterName(
                   props.coursesValid,
-                  { keys: ["name"] },
+                  { keys: ["name", "codcurso"] },
                   e.target.value
                 );
+                if (inputDepartment.length !== 0) {
+                  result = result.filter((value) =>
+                    inputDepartment.includes(value)
+                  );
+                }
                 props.coursesHandler(result);
-              }}
-            />
-          </div>
+              } else {
+                if (inputDepartment.length !== 0) {
+                  const result = props.coursesValid.filter((value) =>
+                    inputDepartment.includes(value)
+                  );
+                  props.coursesHandler(result);
+                } else {
+                  props.coursesHandler(props.coursesValid);
+                }
+              }
+            }}
+          />
         </FieldElementDiv>
       </FilterElementDiv>
       <FilterElementDiv>
-        <FieldElementDiv className="field">
-          <label className="label">Código del curso</label>
-          <div className="controls">
-            <input
-              ref={inputCodigo}
-              className="input"
-              type="text"
-              placeholder="Código del curso"
-              onChange={(e) => {
-                inputNombre.current!.value = "";
-                e.preventDefault();
-                const result = FilterName(
-                  props.coursesValid,
-                  { keys: ["codcurso"] },
-                  e.target.value
-                );
-                props.coursesHandler(result);
-              }}
-            />
-          </div>
-        </FieldElementDiv>
+        <div className="container">
+          <label className="label"> Departamento seleccionado</label>
+          <DropdownCourses
+            coursesValid={props.coursesValid}
+            coursesHandler={props.coursesHandler}
+            inputCourseRef={inputCourseRef}
+            setInputDepartment={setInputDepartment}
+            defaultDepartment={props.defaultDepartment}
+          />
+        </div>
       </FilterElementDiv>
     </FilterDiv>
+  );
+};
+
+const DropdownCourses = (props: {
+  coursesValid: ValidCourses[];
+  coursesHandler: Dispatch<SetStateAction<ValidCourses[]>>;
+  setInputDepartment: Dispatch<SetStateAction<ValidCourses[]>>;
+  inputCourseRef: RefObject<HTMLInputElement>;
+  defaultDepartment: string;
+}) => {
+  const dropdownSpan = useRef<HTMLSpanElement>(null);
+  const triggerSpan = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const fixClick = (e: MouseEvent) => {
+      if (!triggerSpan.current?.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("click", fixClick);
+    return () => {
+      document.removeEventListener("click", fixClick);
+    };
+  }, []);
+
+  const [isOpen, setIsOpen] = useState(false);
+  let departmentsValid = props.coursesValid.map((value) => value.department);
+  departmentsValid = departmentsValid.filter(
+    (value, index) => departmentsValid.indexOf(value) === index
+  );
+  return (
+    <div
+      className={isOpen ? "dropdown is-active" : "dropdown"}
+      style={{ display: "block" }}
+    >
+      <div className="dropdown-trigger">
+        <button
+          className="button"
+          aria-haspopup="tree"
+          aria-controls="dropdown-menu1"
+          onClick={() => {
+            setIsOpen(!isOpen);
+          }}
+          ref={triggerSpan}
+        >
+          <span ref={dropdownSpan}>
+            {props.defaultDepartment === "" || props.defaultDepartment === "general"
+              ? "Ningún departamento"
+              : props.defaultDepartment}
+          </span>
+          <span className="icon is-small">
+            <FontAwesomeIcon icon={faAngleDown} aria-hidden="true" />
+          </span>
+        </button>
+      </div>
+      <div className="dropdown-menu" id="dropdown-menu1" role="menu">
+        <div className="dropdown-content">
+          <a
+            className="dropdown-item DropdownItemDepartment"
+            style={{
+              fontFamily:
+                'BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif',
+              fontSize: "16px",
+              fontWeight: 400,
+            }}
+            onClick={(e) => {
+              setIsOpen(!isOpen);
+              props.inputCourseRef.current!.value = "";
+              props.coursesHandler(props.coursesValid);
+              dropdownSpan.current!.textContent = (
+                e.target as HTMLAnchorElement
+              ).textContent;
+              props.setInputDepartment(props.coursesValid);
+            }}
+          >
+            Ningún departamento{" "}
+          </a>
+          {departmentsValid.map((value) => {
+            return (
+              <a
+                key={value}
+                className="dropdown-item"
+                style={{
+                  fontFamily:
+                    'BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif',
+                  fontSize: "16px",
+                  fontWeight: 400,
+                }}
+                onClick={(e) => {
+                  setIsOpen(!isOpen);
+                  props.inputCourseRef.current!.value = "";
+                  props.coursesHandler(props.coursesValid);
+                  dropdownSpan.current!.textContent = (
+                    e.target as HTMLAnchorElement
+                  ).textContent;
+                  const filtered = props.coursesValid.filter(
+                    (value) =>
+                      Normalize(value.department) ===
+                      Normalize((e.target as HTMLAnchorElement).textContent!)
+                  );
+                  props.setInputDepartment(filtered);
+                  props.coursesHandler(filtered);
+                }}
+              >
+                {value}
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -401,10 +524,10 @@ const ResultsView = forwardRef<
     <ResultsDiv ref={ref}>
       <React.Fragment>
         <HeaderDiv className="pb-2">
-          <h1 className="title is-4 has-text-centered">Nombre</h1>
+          <h2 className="title is-4 has-text-centered">Código</h2>
         </HeaderDiv>
         <HeaderDiv className="pb-2">
-          <h2 className="title is-4 has-text-centered">Código</h2>
+          <h1 className="title is-4 has-text-centered">Nombre</h1>
         </HeaderDiv>
         <HeaderDiv className="pb-2">
           <h2 className="title is-4 has-text-centered">Proyección</h2>
@@ -414,24 +537,24 @@ const ResultsView = forwardRef<
         return (
           <React.Fragment key={value.codcurso}>
             <ResultDiv>
-              <h1 className="subtitle is-6 has-text-centered">{value.name}</h1>
+              <h1 className="subtitle is-6 has-text-centered">
+                {value.codcurso}
+              </h1>
             </ResultDiv>
             <ResultDiv>
-              <h2 className="subtitle is-6 has-text-centered">
-                {value.codcurso}
-              </h2>
+              <h1 className="subtitle is-6 has-text-centered">{value.name}</h1>
             </ResultDiv>
             <ResultDiv>
               {props.length === 0 ? (
                 <SpinLoader />
               ) : (
-                <h2 className="subtitle is-6 has-text-centered">
+                <h1 className="subtitle is-6 has-text-centered">
                   {
                     props.processedData.filter(
                       (data) => data.codcurso === value.codcurso
                     )[0].numericalProjection
                   }
-                </h2>
+                </h1>
               )}
             </ResultDiv>
           </React.Fragment>

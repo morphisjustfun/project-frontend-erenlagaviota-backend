@@ -54,5 +54,5 @@ export const FilterElementDiv = styled.div`
 `;
 
 export const FieldElementDiv = styled.div`
-width: 100%;
-`
+  width: 100%;
+`;
