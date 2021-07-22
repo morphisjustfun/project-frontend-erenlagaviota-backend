@@ -1,50 +1,51 @@
 import { API_BASE_URL } from "../constants";
 import request from "./request";
 
-
 export interface NumericalPrediction {
   numericalProjection: number;
   codcurso: string;
 }
 
 export interface ValidCourses {
-    codcurso: string;
-    department: string;
-    name: string;
+  codcurso: string;
+  department: string;
+  name: string;
 }
 
 export const getNumericalPrediction = async (
   curso: string,
   abortController: AbortController
 ): Promise<NumericalPrediction> => {
-  const response = await request({
-    url: API_BASE_URL + "/data/numericalProjection",
-    method: "POST",
-    body: JSON.stringify({
-      course: curso,
-    }),
-  }, abortController);
+  const response = await request(
+    {
+      url: API_BASE_URL + "/data/numericalProjection",
+      method: "POST",
+      body: JSON.stringify({
+        course: curso,
+      }),
+    },
+    abortController
+  );
   if (response.ok) {
     return response.json().then((value) => {
-        return {
-            numericalProjection: value.numericalProjection,
-            codcurso: curso
-        };
+      return {
+        numericalProjection: value.numericalProjection,
+        codcurso: curso,
+      };
     });
   } else {
     return Promise.reject("No data found");
   }
 };
 
-export const getCourses = async (): Promise<ValidCourses[]>  => {
-    const response = await request({
-        url: API_BASE_URL + "/courses/valid",
-        method: "GET"
-    });
-    if (response.ok){
-        return response.json();
-    }
-    else{
-        return Promise.reject("Invalid data");
-    }
-}
+export const getCourses = async (): Promise<ValidCourses[]> => {
+  const response = await request({
+    url: API_BASE_URL + "/courses/valid",
+    method: "GET",
+  });
+  if (response.ok) {
+    return response.json();
+  } else {
+    return Promise.reject("Invalid data");
+  }
+};

@@ -49,7 +49,7 @@ export const logIn = () => {
             currentUser: null,
             imageUrl: "",
           });
-          reject("error")
+          reject("error");
         }
       });
     });
