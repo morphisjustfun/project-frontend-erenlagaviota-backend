@@ -22,6 +22,7 @@ export const getNumericalPrediction = async (
       method: "POST",
       body: JSON.stringify({
         course: curso,
+        onDemand: "false"
       }),
     },
     abortController
