@@ -1,6 +1,7 @@
 import Doc, { Head, Main, NextScript, Html } from "next/document";
 // Import styled components ServerStyleSheet
 import { ServerStyleSheet } from "styled-components";
+import React from "react"
 
 export default class Document extends Doc {
   static getInitialProps({ renderPage }) {

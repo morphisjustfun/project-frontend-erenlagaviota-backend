@@ -4,7 +4,7 @@ import { Provider } from "react-redux";
 import { store } from "../store";
 import "../styles/styles.scss";
 import Head from "next/head";
-import { onDemand } from "../businesses/constants";
+import React from "react"
 
 function App({ Component, pageProps }: AppProps) {
   return (

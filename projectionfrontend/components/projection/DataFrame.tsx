@@ -3,7 +3,6 @@ import React, {
   forwardRef,
   Fragment,
   MutableRefObject,
-  SetStateAction,
   useEffect,
   useRef,
   useState,
@@ -62,8 +61,7 @@ export const DataFrame = (props: {
             <label
               className="button is-info mr-5"
               onClick={() => {
-                if (selectedCourses.length === 0) {
-                } else {
+                if (selectedCourses.length !== 0) {
                   setIsOpen(true);
                 }
               }}

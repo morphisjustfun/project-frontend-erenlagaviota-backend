@@ -1,4 +1,5 @@
 import styled, { keyframes } from "styled-components";
+import React from "react"
 
 const Ids_ellipsis1 = keyframes`
 0% {

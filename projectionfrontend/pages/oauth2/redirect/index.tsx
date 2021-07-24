@@ -11,7 +11,6 @@ const redirectAndLogin = (token: string): JSX.Element => {
 const OAuth2RedirectHandler = (): JSX.Element => {
   const router = useRouter();
   const token = router.query.token as string;
-  const error = router.query.error as string;
 
   if (token) {
     return redirectAndLogin(token);

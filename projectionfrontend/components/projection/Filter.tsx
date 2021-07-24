@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React,{ useRef, useState } from "react";
 import { ValidCourses } from "../../businesses/request/dataApi";
 import {
   FieldElementDiv,
@@ -6,7 +6,7 @@ import {
   FilterElementDiv,
 } from "../../styles/components/Projection";
 import { DropdownCourses } from "./DropdownCourses";
-import Fuse from "fuse.js";
+import {FilterName} from "../../businesses/FilterName";
 
 export const Filter = (props: {
   coursesHandler: React.Dispatch<React.SetStateAction<ValidCourses[]>>;
@@ -70,11 +70,3 @@ export const Filter = (props: {
   );
 };
 
-const FilterName = (
-  list: ValidCourses[],
-  options: Fuse.IFuseOptions<ValidCourses>,
-  input: string
-): ValidCourses[] => {
-  const FuseSearch = new Fuse(list, options);
-  return FuseSearch.search(input).map((result) => result.item);
-};
