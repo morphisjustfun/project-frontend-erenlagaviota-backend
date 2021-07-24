@@ -204,29 +204,31 @@ const ResultView = (props: {
   }, []);
   return (
     <Fragment>
-      {mergedResult.current.length !== 0 ? (
-        <div className="buttons is-centered">
-          <CsvDownload
-            data={mergedResult.current}
-            className="button"
-            filename="Cursos_Resultados.csv"
-          >
-            Descargar resultados en CSV
-          </CsvDownload>
-          <button className="button" onClick={handlePrint}>
-            Imprimir
-          </button>
-          <button
-            className="button is-danger"
-            onClick={() => {
-              abortController.abort();
-              props.onClose(false);
-            }}
-          >
-            Cerrar
-          </button>
-        </div>
-      ) : null}
+      <div className="buttons is-centered">
+        {mergedResult.current.length !== 0 ? (
+          <Fragment>
+            <CsvDownload
+              data={mergedResult.current}
+              className="button"
+              filename="Cursos_Resultados.csv"
+            >
+              Descargar resultados en CSV
+            </CsvDownload>
+            <button className="button" onClick={handlePrint}>
+              Imprimir
+            </button>
+          </Fragment>
+        ) : null}
+        <button
+          className="button is-danger"
+          onClick={() => {
+            abortController.abort();
+            props.onClose(false);
+          }}
+        >
+          Cerrar
+        </button>
+      </div>
       <ResultsView
         ref={componentRef}
         length={processedData.length}
