@@ -16,7 +16,6 @@ const OAuth2RedirectHandler = (): JSX.Element => {
   if (token) {
     return redirectAndLogin(token);
   } else {
-    console.log(error);
     return <Redirect to="/" />;
   }
 };

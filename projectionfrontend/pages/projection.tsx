@@ -22,6 +22,20 @@ const Projection = (): JSX.Element => {
 
   let defaultDepartment = useRef("");
 
+  let doneLoading = useRef(false);
+
+  const doneFilter = () => {
+    doneLoading.current = true;
+    return (
+      <Filter
+        coursesHandler={setCoursesMirror}
+        coursesMirror={coursesMirror}
+        coursesValid={coursesValid}
+        defaultDepartment={defaultDepartment.current}
+      />
+    );
+  };
+
   useEffect(() => {
     const coursesRequest = () => {
       /* @ts-ignore */
@@ -62,12 +76,9 @@ const Projection = (): JSX.Element => {
           role={loginS.currentUser.role}
           email={loginS.currentUser.email}
         />
-        <Filter
-          coursesHandler={setCoursesMirror}
-          coursesMirror={coursesMirror}
-          coursesValid={coursesValid}
-          defaultDepartment={defaultDepartment.current}
-        />
+        {coursesMirror.length !== 0 || doneLoading.current
+          ? doneFilter()
+          : null}
         <DataFrame
           courses={coursesMirror}
           coursesHandler={setCoursesMirror}

@@ -3,6 +3,7 @@ import React, {
   forwardRef,
   Fragment,
   MutableRefObject,
+  SetStateAction,
   useEffect,
   useRef,
   useState,
@@ -38,6 +39,7 @@ export const DataFrame = (props: {
     coursesHandler: React.Dispatch<React.SetStateAction<ValidCourses[]>>;
     coursesMirror: ValidCourses[];
     coursesValid: ValidCourses[];
+    coursesFiltered: ValidCourses[];
   }) => {
     const [modalIsOpen, setIsOpen] = React.useState(false);
     const modalStyle = {
@@ -55,23 +57,26 @@ export const DataFrame = (props: {
     const onDemand = useRef(false);
     return (
       <div className="mb-3 has-text-centered">
-        <label
-          className="button is-info mr-5"
-          onClick={() => {
-            if (selectedCourses.length === 0) {
-              alert("No hay cursos seleccionados");
-            } else {
-              setIsOpen(true);
-            }
-          }}
-        >
-          CALCULAR PROYECCIÓN
-        </label>
-        <Checkbox
-          handlerOnDemand={(value) => {
-            onDemand.current = value;
-          }}
-        />
+        {props.coursesFiltered.length !== 0 && selectedCourses.length !== 0 ? (
+          <Fragment>
+            <label
+              className="button is-info mr-5"
+              onClick={() => {
+                if (selectedCourses.length === 0) {
+                } else {
+                  setIsOpen(true);
+                }
+              }}
+            >
+              CALCULAR PROYECCIÓN
+            </label>
+            <Checkbox
+              handlerOnDemand={(value) => {
+                onDemand.current = value;
+              }}
+            />
+          </Fragment>
+        ) : null}
         <Modal
           isOpen={modalIsOpen}
           style={modalStyle}
@@ -120,6 +125,7 @@ export const DataFrame = (props: {
         coursesHandler={props.coursesHandler}
         coursesValid={props.coursesValid}
         coursesMirror={props.coursesValid}
+        coursesFiltered={props.courses}
       />
       <DataTable
         columns={columns}
@@ -158,7 +164,7 @@ export const DataFrame = (props: {
 const ResultView = (props: {
   selectedCourses: { codcurso: string; name: string }[];
   onClose: Dispatch<React.SetStateAction<boolean>>;
-  onDemand: boolean
+  onDemand: boolean;
 }) => {
   const componentRef = useRef();
   const handlePrint = useReactToPrint({
@@ -178,7 +184,11 @@ const ResultView = (props: {
     const getPrediction = async () => {
       const jsonData = await Promise.all(
         props.selectedCourses.map((value) => {
-          return getNumericalPrediction(value.codcurso, abortController,props.onDemand);
+          return getNumericalPrediction(
+            value.codcurso,
+            abortController,
+            props.onDemand
+          );
         })
       );
       mergedResult.current = props.selectedCourses.map((x) =>
@@ -194,27 +204,29 @@ const ResultView = (props: {
   }, []);
   return (
     <Fragment>
-      <div className="buttons is-centered">
-        <CsvDownload
-          data={mergedResult.current}
-          className="button"
-          filename="Cursos_Resultados.csv"
-        >
-          Descargar resultados en CSV
-        </CsvDownload>
-        <button className="button" onClick={handlePrint}>
-          Imprimir
-        </button>
-        <button
-          className="button is-danger"
-          onClick={() => {
-            abortController.abort();
-            props.onClose(false);
-          }}
-        >
-          Cerrar
-        </button>
-      </div>
+      {mergedResult.current.length !== 0 ? (
+        <div className="buttons is-centered">
+          <CsvDownload
+            data={mergedResult.current}
+            className="button"
+            filename="Cursos_Resultados.csv"
+          >
+            Descargar resultados en CSV
+          </CsvDownload>
+          <button className="button" onClick={handlePrint}>
+            Imprimir
+          </button>
+          <button
+            className="button is-danger"
+            onClick={() => {
+              abortController.abort();
+              props.onClose(false);
+            }}
+          >
+            Cerrar
+          </button>
+        </div>
+      ) : null}
       <ResultsView
         ref={componentRef}
         length={processedData.length}
