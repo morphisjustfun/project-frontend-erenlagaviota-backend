@@ -14,7 +14,8 @@ export interface ValidCourses {
 
 export const getNumericalPrediction = async (
   curso: string,
-  abortController: AbortController
+  abortController: AbortController,
+  onDemand: boolean
 ): Promise<NumericalPrediction> => {
   const response = await request(
     {
@@ -22,7 +23,7 @@ export const getNumericalPrediction = async (
       method: "POST",
       body: JSON.stringify({
         course: curso,
-        onDemand: "false"
+        onDemand: onDemand.toString()
       }),
     },
     abortController

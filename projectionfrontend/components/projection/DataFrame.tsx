@@ -22,6 +22,8 @@ import Modal from "react-modal";
 import CsvDownload from "react-json-to-csv";
 import { useReactToPrint } from "react-to-print";
 import SpinLoader from "../SpinLoader";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
 export const DataFrame = (props: {
   courses: ValidCourses[];
@@ -50,10 +52,11 @@ export const DataFrame = (props: {
         transform: "translate(-50%, -50%)",
       },
     };
+    const onDemand = useRef(false);
     return (
       <div className="mb-3 has-text-centered">
-        <button
-          className="button is-info"
+        <label
+          className="button is-info mr-5"
           onClick={() => {
             if (selectedCourses.length === 0) {
               alert("No hay cursos seleccionados");
@@ -63,7 +66,12 @@ export const DataFrame = (props: {
           }}
         >
           CALCULAR PROYECCIÓN
-        </button>
+        </label>
+        <Checkbox
+          handlerOnDemand={(value) => {
+            onDemand.current = value;
+          }}
+        />
         <Modal
           isOpen={modalIsOpen}
           style={modalStyle}
@@ -74,6 +82,7 @@ export const DataFrame = (props: {
             <ResultView
               selectedCourses={selectedCourses}
               onClose={setIsOpen}
+              onDemand={onDemand.current}
             ></ResultView>
           </div>
         </Modal>
@@ -149,6 +158,7 @@ export const DataFrame = (props: {
 const ResultView = (props: {
   selectedCourses: { codcurso: string; name: string }[];
   onClose: Dispatch<React.SetStateAction<boolean>>;
+  onDemand: boolean
 }) => {
   const componentRef = useRef();
   const handlePrint = useReactToPrint({
@@ -168,7 +178,7 @@ const ResultView = (props: {
     const getPrediction = async () => {
       const jsonData = await Promise.all(
         props.selectedCourses.map((value) => {
-          return getNumericalPrediction(value.codcurso, abortController);
+          return getNumericalPrediction(value.codcurso, abortController,props.onDemand);
         })
       );
       mergedResult.current = props.selectedCourses.map((x) =>
@@ -266,3 +276,26 @@ const ResultsView = forwardRef<
   );
 });
 ResultsView.displayName = "ResultsView";
+
+const Checkbox = (props: { handlerOnDemand: (value: boolean) => void }) => {
+  const [check, setCheck] = useState(false);
+  return (
+    <span className="control">
+      <label className="is-checkbox">
+        <input
+          id="onDemandCheckbox"
+          checked={check}
+          type="checkbox"
+          onChange={(e) => {
+            props.handlerOnDemand(e.target.checked);
+          }}
+          onClick={() => setCheck(!check)}
+        />
+        <span className="icon checkmark">
+          <FontAwesomeIcon icon={faCheck} />
+        </span>
+        <span>ONDEMAND</span>
+      </label>
+    </span>
+  );
+};
