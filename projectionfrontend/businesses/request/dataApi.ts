@@ -1,5 +1,6 @@
 import { API_BASE_URL } from "../constants";
 import request from "./request";
+import Router from "next/router"
 
 export interface NumericalPrediction {
   numericalProjection: number;
@@ -23,7 +24,7 @@ export const getNumericalPrediction = async (
       method: "POST",
       body: JSON.stringify({
         course: curso,
-        onDemand: onDemand.toString()
+        onDemand: onDemand.toString(),
       }),
     },
     abortController
@@ -36,6 +37,8 @@ export const getNumericalPrediction = async (
       };
     });
   } else {
+    abortController.abort();
+    Router.push("/error","/");
     return Promise.reject("No data found");
   }
 };
@@ -48,6 +51,7 @@ export const getCourses = async (): Promise<ValidCourses[]> => {
   if (response.ok) {
     return response.json();
   } else {
+    Router.push("/error","/");
     return Promise.reject("Invalid data");
   }
 };

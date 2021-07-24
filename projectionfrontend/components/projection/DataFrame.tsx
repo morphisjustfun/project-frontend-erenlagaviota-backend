@@ -23,7 +23,13 @@ import CsvDownload from "react-json-to-csv";
 import { useReactToPrint } from "react-to-print";
 import SpinLoader from "../SpinLoader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheck,
+  faDownload,
+  faPrint,
+  faSortAmountDown,
+  faSortAmountUp,
+} from "@fortawesome/free-solid-svg-icons";
 
 export const DataFrame = (props: {
   courses: ValidCourses[];
@@ -200,6 +206,8 @@ const ResultView = (props: {
     getPrediction();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const [orderResults, setOrderResults] = useState(false); //default descendente
   return (
     <Fragment>
       <div className="buttons is-centered">
@@ -210,10 +218,30 @@ const ResultView = (props: {
               className="button"
               filename="Cursos_Resultados.csv"
             >
-              Descargar resultados en CSV
+              <span className="icon">
+                <FontAwesomeIcon icon={faDownload} />
+              </span>
+              <span>Descargar resultados en CSV</span>
             </CsvDownload>
             <button className="button" onClick={handlePrint}>
-              Imprimir
+              <span className="icon">
+                <FontAwesomeIcon icon={faPrint} />
+              </span>
+              <span> Imprimir</span>
+            </button>
+            <button
+              className="button"
+              onClick={() => {
+                setOrderResults(!orderResults);
+              }}
+            >
+              <span className="icon">
+                {orderResults ? (
+                  <FontAwesomeIcon icon={faSortAmountUp} />
+                ) : (
+                  <FontAwesomeIcon icon={faSortAmountDown} />
+                )}
+              </span>
             </button>
           </Fragment>
         ) : null}
@@ -232,6 +260,7 @@ const ResultView = (props: {
         length={processedData.length}
         processedData={processedData}
         selectedCourses={props.selectedCourses}
+        ascendent={orderResults}
       ></ResultsView>
     </Fragment>
   );
@@ -242,8 +271,25 @@ const ResultsView = forwardRef<
     length: number;
     processedData: NumericalPrediction[];
     selectedCourses: { codcurso: string; name: string }[];
+    ascendent: boolean;
   }
 >((props, ref) => {
+  let sortedList = props.selectedCourses.map((value) => ({
+    name: value.name,
+    codcurso: value.codcurso,
+    numericalProjection:
+      props.processedData.length !== 0
+        ? props.processedData.filter(
+            (data) => data.codcurso === value.codcurso
+          )[0].numericalProjection
+        : 0,
+  }));
+
+  sortedList = sortedList.sort((value1, value2) => {
+    if (value1.numericalProjection < value2.numericalProjection) return props.ascendent ? -1 : 1;
+    if (value1.numericalProjection > value2.numericalProjection) return props.ascendent ? 1 : -1;
+    return 0;
+  });
   return (
     <ResultsDiv ref={ref}>
       <React.Fragment>
@@ -257,33 +303,61 @@ const ResultsView = forwardRef<
           <h2 className="title is-4 has-text-centered">Proyección</h2>
         </HeaderDiv>
       </React.Fragment>
-      {props.selectedCourses.map((value) => {
-        return (
-          <React.Fragment key={value.codcurso}>
-            <ResultDiv>
-              <h1 className="subtitle is-6 has-text-centered">
-                {value.codcurso}
-              </h1>
-            </ResultDiv>
-            <ResultDiv>
-              <h1 className="subtitle is-6 has-text-centered">{value.name}</h1>
-            </ResultDiv>
-            <ResultDiv>
-              {props.length === 0 ? (
-                <SpinLoader />
-              ) : (
-                <h1 className="subtitle is-6 has-text-centered">
-                  {
-                    props.processedData.filter(
-                      (data) => data.codcurso === value.codcurso
-                    )[0].numericalProjection
-                  }
-                </h1>
-              )}
-            </ResultDiv>
-          </React.Fragment>
-        );
-      })}
+      {props.processedData.length === 0
+        ? props.selectedCourses.map((value) => {
+            return (
+              <React.Fragment key={value.codcurso}>
+                <ResultDiv>
+                  <h1 className="subtitle is-6 has-text-centered">
+                    {value.codcurso}
+                  </h1>
+                </ResultDiv>
+                <ResultDiv>
+                  <h1 className="subtitle is-6 has-text-centered">
+                    {value.name}
+                  </h1>
+                </ResultDiv>
+                <ResultDiv>
+                  {props.length === 0 ? (
+                    <SpinLoader />
+                  ) : (
+                    <h1 className="subtitle is-6 has-text-centered">
+                      {
+                        props.processedData.filter(
+                          (data) => data.codcurso === value.codcurso
+                        )[0].numericalProjection
+                      }
+                    </h1>
+                  )}
+                </ResultDiv>
+              </React.Fragment>
+            );
+          })
+        : sortedList.map((value) => {
+            return (
+              <React.Fragment key={value.codcurso}>
+                <ResultDiv>
+                  <h1 className="subtitle is-6 has-text-centered">
+                    {value.codcurso}
+                  </h1>
+                </ResultDiv>
+                <ResultDiv>
+                  <h1 className="subtitle is-6 has-text-centered">
+                    {value.name}
+                  </h1>
+                </ResultDiv>
+                <ResultDiv>
+                  {props.length === 0 ? (
+                    <SpinLoader />
+                  ) : (
+                    <h1 className="subtitle is-6 has-text-centered">
+                      {value.numericalProjection}
+                    </h1>
+                  )}
+                </ResultDiv>
+              </React.Fragment>
+            );
+          })}
     </ResultsDiv>
   );
 });
