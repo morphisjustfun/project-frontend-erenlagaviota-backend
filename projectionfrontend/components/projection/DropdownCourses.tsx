@@ -55,7 +55,7 @@ export const DropdownCourses = (props: {
           <span ref={dropdownSpan}>
             {props.defaultDepartment === "" ||
             props.defaultDepartment === "general"
-              ? "Ningún departamento"
+              ? "Seleccionar"
               : props.defaultDepartment}
           </span>
           <span className="icon is-small">
@@ -83,7 +83,7 @@ export const DropdownCourses = (props: {
               props.setInputDepartment(props.coursesValid);
             }}
           >
-            Ningún departamento{" "}
+            Seleccionar
           </a>
           {departmentsValid.map((value) => {
             return (

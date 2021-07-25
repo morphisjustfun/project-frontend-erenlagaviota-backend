@@ -72,7 +72,7 @@ export const DataFrame = (props: {
                 }
               }}
             >
-              CALCULAR PROYECCIÓN
+             VER PROYECCIÓN
             </label>
             <Checkbox
               handlerOnDemand={(value) => {
@@ -236,11 +236,9 @@ const ResultView = (props: {
               }}
             >
               <span className="icon">
-                {orderResults ? (
-                  <FontAwesomeIcon icon={faSortAmountUp} />
-                ) : (
-                  <FontAwesomeIcon icon={faSortAmountDown} />
-                )}
+                <FontAwesomeIcon
+                  icon={orderResults ? faSortAmountUp : faSortAmountDown}
+                />
               </span>
             </button>
           </Fragment>
@@ -265,6 +263,14 @@ const ResultView = (props: {
     </Fragment>
   );
 };
+
+const conditionToNumber = (value: boolean) => {
+    if (value){
+    return 1;
+    }
+    return -1;
+}
+
 const ResultsView = forwardRef<
   any,
   {
@@ -286,8 +292,10 @@ const ResultsView = forwardRef<
   }));
 
   sortedList = sortedList.sort((value1, value2) => {
-    if (value1.numericalProjection < value2.numericalProjection) return props.ascendent ? -1 : 1;
-    if (value1.numericalProjection > value2.numericalProjection) return props.ascendent ? 1 : -1;
+    if (value1.numericalProjection < value2.numericalProjection)
+      return conditionToNumber(props.ascendent) * -1;
+    if (value1.numericalProjection > value2.numericalProjection)
+      return conditionToNumber(props.ascendent);
     return 0;
   });
   return (
@@ -380,7 +388,7 @@ const Checkbox = (props: { handlerOnDemand: (value: boolean) => void }) => {
         <span className="icon checkmark">
           <FontAwesomeIcon icon={faCheck} />
         </span>
-        <span>ONDEMAND</span>
+        <span>CALCULAR PROYECCIÓN</span>
       </label>
     </span>
   );

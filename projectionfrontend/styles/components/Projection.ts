@@ -41,7 +41,7 @@ export const HeaderDiv = styled.div`
 
 export const FilterDiv = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
   align-items: center;
   gap: 3rem;
 `;
