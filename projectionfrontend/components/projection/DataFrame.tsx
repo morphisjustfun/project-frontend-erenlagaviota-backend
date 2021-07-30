@@ -31,7 +31,9 @@ import {
   faSortAmountUp,
 } from "@fortawesome/free-solid-svg-icons";
 
-export let handleClearRows = () => {};
+export let handleClearRows = () => {
+//to be replaced
+};
 
 
 export const DataFrame = (props: {
