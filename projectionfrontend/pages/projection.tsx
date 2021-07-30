@@ -173,7 +173,7 @@ const WelcomeModal = () => {
             <strong>El selector de departamento </strong>le permitirá filtrar de
             acuerdo al departamento de su interés. Si selecciona "seleccionar",
             el filtro no tendrá efecto. <br />
-            <strong>El recuadro de búsqueda </strong> le permitirá busca por
+            <strong>El recuadro de búsqueda </strong> le permitirá buscar por
             nombre o código. No se realiza una búsqueda exacta, sino por rango y
             aproximación. Si ingresa un valor con tildes o letras no
             coincidentes, de acuerdo al grado de tolerancia se le mostrarán
