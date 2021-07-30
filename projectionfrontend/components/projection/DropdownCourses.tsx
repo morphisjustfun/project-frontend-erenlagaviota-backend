@@ -10,6 +10,7 @@ import { ValidCourses } from "../../businesses/request/dataApi";
 import { faAngleDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Normalize } from "../../businesses/normalize";
+import { handleClearRows } from "./DataFrame";
 
 export const DropdownCourses = (props: {
   coursesValid: ValidCourses[];
@@ -81,6 +82,7 @@ export const DropdownCourses = (props: {
                 e.target as HTMLAnchorElement
               ).textContent;
               props.setInputDepartment(props.coursesValid);
+              handleClearRows();
             }}
           >
             Seleccionar
@@ -110,6 +112,7 @@ export const DropdownCourses = (props: {
                   );
                   props.setInputDepartment(filtered);
                   props.coursesHandler(filtered);
+                  handleClearRows();
                 }}
               >
                 {value}

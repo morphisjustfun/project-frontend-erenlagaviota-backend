@@ -123,8 +123,19 @@ const WelcomeModal = () => {
       style={modalStyle}
     >
       <div className="container">
-        <div className="is-flex is-align-items-center is-justify-content-center mt-3 mb-3">
+        <div className="container mt-2 mb-5 is-flex is-justify-content-center">
           <h1 className="title is-3 has-text-centerd"> Tutorial </h1>
+        </div>
+        <div className="container mt-2 mb-5 is-flex is-justify-content-center">
+          <button
+            className="button is-danger"
+            onClick={() => {
+              document.body.classList.remove("is-clipped");
+              setIsOpen(false);
+            }}
+          >
+            Cerrar
+          </button>
         </div>
         <WelcomeGrid>
           <div className="is-flex is-align-items-center">
@@ -181,17 +192,6 @@ const WelcomeModal = () => {
             </WelcomeText>
           </div>
         </WelcomeGrid>
-        <div className="is-flex is-justify-content-center mt-6">
-          <button
-            className="button is-danger"
-            onClick={() => {
-              document.body.classList.remove("is-clipped");
-              setIsOpen(false);
-            }}
-          >
-            Cerrar
-          </button>
-        </div>
       </div>
     </Modal>
   );

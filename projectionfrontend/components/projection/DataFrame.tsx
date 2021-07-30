@@ -31,6 +31,9 @@ import {
   faSortAmountUp,
 } from "@fortawesome/free-solid-svg-icons";
 
+export let handleClearRows = () => {};
+
+
 export const DataFrame = (props: {
   courses: ValidCourses[];
   coursesHandler: React.Dispatch<React.SetStateAction<ValidCourses[]>>;
@@ -42,7 +45,7 @@ export const DataFrame = (props: {
   );
   const [toggleClearRows, setToggleClearRows] = useState(false);
 
-  const handleClearRows = () => {
+  handleClearRows = () => {
     setSelectedCourses([]);
     setToggleClearRows(!toggleClearRows);
   };
