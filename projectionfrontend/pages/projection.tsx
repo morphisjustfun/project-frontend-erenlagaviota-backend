@@ -69,7 +69,7 @@ const Projection = (): JSX.Element => {
   }, []);
 
   if (loginS.authenticated.waiting) {
-    return <h1>Loading</h1>;
+    return <h1>Cargando</h1>;
   } else if (
     !loginS.authenticated.waiting &&
     !loginS.authenticated.authenticated
