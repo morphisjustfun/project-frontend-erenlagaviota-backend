@@ -36,7 +36,7 @@ const Login = () => {
   } else {
     return (
       <div>
-        <LoginBackgroundImg src="/background.svg" alt="Not found" />
+        <LoginBackgroundImg src="https://images.adsttc.com/media/images/5812/5024/e58e/ce96/7800/00cf/slideshow/UTEC_-_Universidad_de_Ingenieria_y_Tecnologia_PressImage_Iwan_Baan_2.jpg?1477595162" alt="Not found" />
         <LoginGridDiv>
           <LogoContainerDiv>
             <LogoImg src={logoURL} alt="Not found" />

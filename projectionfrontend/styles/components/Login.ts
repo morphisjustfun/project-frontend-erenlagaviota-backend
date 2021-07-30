@@ -4,8 +4,9 @@ export const LoginGridDiv = styled.div`
   width: 100vw;
   height: 100vh;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 7rem;
+  grid-template-columns: repeat(auto-fit, minmax(20rem,1fr));
+  row-gap: 0;
+  column-gap: 6rem;
   padding: 0 2rem;
 `;
 
@@ -18,7 +19,7 @@ export const LoginBackgroundImg = styled.img`
   width: 100%;
   height: 100%;
   opacity: 0.5;
-  filter: opacity(0.5) brightness(0.8);
+  filter: blur(3px) opacity(0.25) brightness(1);
   object-fit: cover;
 `;
 

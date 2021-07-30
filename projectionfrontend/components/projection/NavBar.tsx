@@ -8,7 +8,7 @@ export const NavBar = (props: {
 }) => (
   <NavBarDiv>
     <TitleDiv>
-      <h1 className="title is-1" style={{textAlign: 'center'}}>Sistema de proyecciones</h1>
+      <h1 className="title is-2" style={{textAlign: 'center'}}>Sistema de proyecciones</h1>
     </TitleDiv>
     <TitleDiv>
       <figure className="image is-128x128">

@@ -40,6 +40,13 @@ export const DataFrame = (props: {
   const [selectedCourses, setSelectedCourses] = useState(
     [] as { codcurso: string; name: string }[]
   );
+  const [toggleClearRows, setToggleClearRows] = useState(false);
+
+  const handleClearRows = () => {
+    setSelectedCourses([]);
+    setToggleClearRows(!toggleClearRows);
+  };
+
   const ButtonContainer = (props: {
     coursesHandler: React.Dispatch<React.SetStateAction<ValidCourses[]>>;
     coursesMirror: ValidCourses[];
@@ -65,14 +72,14 @@ export const DataFrame = (props: {
         {props.coursesFiltered.length !== 0 && selectedCourses.length !== 0 ? (
           <Fragment>
             <label
-              className="button is-info mr-5"
+              className="button is-info mr-5 mb-5"
               onClick={() => {
                 if (selectedCourses.length !== 0) {
                   setIsOpen(true);
                 }
               }}
             >
-             VER PROYECCIÓN
+              VER PROYECCIÓN
             </label>
             <Checkbox
               handlerOnDemand={(value) => {
@@ -92,6 +99,7 @@ export const DataFrame = (props: {
               selectedCourses={selectedCourses}
               onClose={setIsOpen}
               onDemand={onDemand.current}
+              clearRows={handleClearRows}
             ></ResultView>
           </div>
         </Modal>
@@ -140,6 +148,7 @@ export const DataFrame = (props: {
           </div>
         }
         pagination
+        selectableRowsHighlight
         paginationComponentOptions={paginationOptions}
         responsive
         selectableRows
@@ -148,6 +157,7 @@ export const DataFrame = (props: {
           singular: "curso",
           message: "selecccionados",
         }}
+        clearSelectedRows={toggleClearRows}
         onSelectedRowsChange={(event) => {
           setSelectedCourses(
             event.selectedRows.map((value) => {
@@ -169,6 +179,7 @@ const ResultView = (props: {
   selectedCourses: { codcurso: string; name: string }[];
   onClose: Dispatch<React.SetStateAction<boolean>>;
   onDemand: boolean;
+  clearRows: () => void;
 }) => {
   const componentRef = useRef();
   const handlePrint = useReactToPrint({
@@ -185,6 +196,7 @@ const ResultView = (props: {
     } & NumericalPrediction)[]
   > = useRef([]);
   useEffect(() => {
+    document.body.classList.add("is-clipped");
     const getPrediction = async () => {
       const jsonData = await Promise.all(
         props.selectedCourses.map((value) => {
@@ -247,6 +259,8 @@ const ResultView = (props: {
           className="button is-danger"
           onClick={() => {
             abortController.abort();
+            props.clearRows();
+            document.body.classList.remove("is-clipped");
             props.onClose(false);
           }}
         >
@@ -265,11 +279,11 @@ const ResultView = (props: {
 };
 
 const conditionToNumber = (value: boolean) => {
-    if (value){
+  if (value) {
     return 1;
-    }
-    return -1;
-}
+  }
+  return -1;
+};
 
 const ResultsView = forwardRef<
   any,
@@ -302,13 +316,13 @@ const ResultsView = forwardRef<
     <ResultsDiv ref={ref}>
       <React.Fragment>
         <HeaderDiv className="pb-2">
-          <h2 className="title is-4 has-text-centered">Código</h2>
+          <h2 className="title is-5 has-text-centered">Código</h2>
         </HeaderDiv>
         <HeaderDiv className="pb-2">
-          <h1 className="title is-4 has-text-centered">Nombre</h1>
+          <h1 className="title is-5 has-text-centered">Nombre</h1>
         </HeaderDiv>
         <HeaderDiv className="pb-2">
-          <h2 className="title is-4 has-text-centered">Proyección</h2>
+          <h2 className="title is-5 has-text-centered">Proyección</h2>
         </HeaderDiv>
       </React.Fragment>
       {props.processedData.length === 0
@@ -316,20 +330,16 @@ const ResultsView = forwardRef<
             return (
               <React.Fragment key={value.codcurso}>
                 <ResultDiv>
-                  <h1 className="subtitle is-6 has-text-centered">
-                    {value.codcurso}
-                  </h1>
+                  <h1 className=" has-text-centered">{value.codcurso}</h1>
                 </ResultDiv>
                 <ResultDiv>
-                  <h1 className="subtitle is-6 has-text-centered">
-                    {value.name}
-                  </h1>
+                  <h1 className=" has-text-centered">{value.name}</h1>
                 </ResultDiv>
                 <ResultDiv>
                   {props.length === 0 ? (
                     <SpinLoader />
                   ) : (
-                    <h1 className="subtitle is-6 has-text-centered">
+                    <h1 className=" has-text-centered">
                       {
                         props.processedData.filter(
                           (data) => data.codcurso === value.codcurso
@@ -345,20 +355,16 @@ const ResultsView = forwardRef<
             return (
               <React.Fragment key={value.codcurso}>
                 <ResultDiv>
-                  <h1 className="subtitle is-6 has-text-centered">
-                    {value.codcurso}
-                  </h1>
+                  <h1 className=" has-text-centered">{value.codcurso}</h1>
                 </ResultDiv>
                 <ResultDiv>
-                  <h1 className="subtitle is-6 has-text-centered">
-                    {value.name}
-                  </h1>
+                  <h1 className=" has-text-centered">{value.name}</h1>
                 </ResultDiv>
                 <ResultDiv>
                   {props.length === 0 ? (
                     <SpinLoader />
                   ) : (
-                    <h1 className="subtitle is-6 has-text-centered">
+                    <h1 className=" is-6 has-text-centered">
                       {value.numericalProjection}
                     </h1>
                   )}
@@ -375,7 +381,7 @@ const Checkbox = (props: { handlerOnDemand: (value: boolean) => void }) => {
   const [check, setCheck] = useState(false);
   return (
     <span className="control">
-      <label className="is-checkbox">
+      <label className="is-checkbox button is-light mb-5">
         <input
           id="onDemandCheckbox"
           checked={check}
